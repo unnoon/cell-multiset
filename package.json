@@ -15,8 +15,7 @@
     "preprocess": "metascript src/MultiSet.js > bin/MultiSet.js -MODULE_TYPE=non-es6 -VERSION=%npm_package_version%",
     "preprocess:es6": "metascript src/MultiSet.js > bin/es6/MultiSet.js -MODULE_TYPE=es6 -VERSION=%npm_package_version%",
     "test": "karma start --single-run",
-    "update": "ncu -u && npm install",
-    "postinstall": "bower install"
+    "update": "ncu -u && npm install"
   },
   "repository": {
     "type": "git",

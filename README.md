@@ -7,10 +7,6 @@
 
 Fast & consistent JavaScript MultiSet (AKA bag, bunch) implementation. Implemented as part of my upcoming(...loading...) cell game engine, but perfectly usable as a standalone lib.
 
-## Very alpha
-
-Please wait for the first release...
-
 ## Features
 
 - Fast! 
