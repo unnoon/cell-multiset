@@ -16,7 +16,7 @@
         /**
          * @name MultiSet#$info
          * @desc
-         *       Info object to hold general module information
+         *       Info object to hold general module information.
          */
         $info: {
             "name"       : "cell-multiset",
@@ -30,9 +30,9 @@
          * #
          *         Easy create method for people who use prototypal inheritance.
          *
-         * @param {[Iterable]=} iterable_ - iterable object to initialize the set
+         * @param {[Iterable]=} iterable_ - iterable object to initialize the set.
          *
-         * @return {MultiSet} new MultiSet.
+         * @return {MultiSet} new MultiSet
          */
         $create: function(iterable_) {
         "@aliases: $spawn";
@@ -44,7 +44,7 @@
          * @desc
          *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
          *
-         * @param {[Iterable]=} elms_ - iterable object to initialize the set
+         * @param {[Iterable]=} elms_ - iterable object to initialize the set.
          *
          * @returns {MultiSet} this
          */
@@ -57,9 +57,9 @@
         /**
          * @method MultiSet#add
          * @desc
-         *         Adds one or multiple elements to the multiset
+         *         Adds one or multiple elements to the multiset.
          *
-         * @param {...any} elms - one or multiple elements to add to the set
+         * @param {...any} elms - one or multiple elements to add to the set.
          *
          * @returns {MultiSet} this
          */
@@ -80,11 +80,11 @@
          * @method MultiSet#has
          * @desc   **aliases:** isMember
          * #
-         *         Checks membership of an elm in the multiset
+         *         Checks membership of an elm in the multiset.
          *
-         * @param {any} elm - element to check the membership for
+         * @param {any} elm - element to check the membership for.
          *
-         * @returns {boolean} boolean indicating the membership of the element
+         * @returns {boolean} boolean indicating the membership of the element.
          */
         has: function(elm) {
         "@aliases: isMember";
@@ -99,7 +99,7 @@
      * @desc
      *        Fast JS MultiSet implementation.
      *
-     * @param {[Iterable]=} iterable_ - iterable object to initialize the set
+     * @param {[Iterable]=} iterable_ - iterable object to initialize the set.
      *
      * @return {MultiSet} new MultiSet
      */
