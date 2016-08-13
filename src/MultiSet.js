@@ -53,6 +53,8 @@
             this.elements = new Map();
 
             if(elms_) {for(var elm of elms_) {this.add(elm)}}
+
+            return this
         },
         /**
          * @method MultiSet#add
