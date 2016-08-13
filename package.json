@@ -1,0 +1,56 @@
+{
+  "name": "cell-multiset",
+  "version": "0.0.0",
+  "description": "Fast JS MultiSet implementation.",
+  "main": "src/MultiSet.js",
+  "scripts": {
+    "babel": "babel bin/MultiSet.js -o bin/es5/MultiSet.js",
+    "build": "npm run preprocess && npm run preprocess:es6 && npm run babel && npm run minify",
+    "docs": "rimraf -rf doc && jsdoc -c .jsdoc.conf.json",
+    "minify": "uglifyjs bin/es5/MultiSet.js --compress --mangle --output bin/es5/MultiSet.min.js",
+    "release": "npm version",
+    "preversion": "npm test && npm run docs",
+    "version": "npm run build && git add -A bin",
+    "postversion": "git push && git push --tags && npm publish",
+    "preprocess": "metascript src/MultiSet.js > bin/MultiSet.js -MODULE_TYPE=non-es6 -VERSION=%npm_package_version%",
+    "preprocess:es6": "metascript src/MultiSet.js > bin/es6/MultiSet.js -MODULE_TYPE=es6 -VERSION=%npm_package_version%",
+    "test": "karma start --single-run",
+    "update": "ncu -u && npm install",
+    "postinstall": "bower install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unnoon/cell-multiset.git"
+  },
+  "keywords": [
+    "multiset",
+    "bag",
+    "bunch",
+    "fast"
+  ],
+  "author": "Rogier Geertzema",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-preset-es2015": "^6.9.0",
+    "coveralls": "^2.11.9",
+    "jaguarjs-jsdoc": "1.0.0",
+    "jsdoc": "^3.4.0",
+    "karma": "^1.1.2",
+    "karma-chai-plugins": "~0.7.0",
+    "karma-chrome-launcher": "~1.0.1",
+    "karma-coverage": "~1.1.0",
+    "karma-coveralls": "~1.1.2",
+    "karma-firefox-launcher": "~1.0.0",
+    "karma-ie-launcher": "~1.0.0",
+    "karma-mocha": "~1.1.1",
+    "karma-phantomjs-launcher": "~1.0.0",
+    "karma-requirejs": "~1.0.0",
+    "metascript": "^1.0.0",
+    "mocha": "^3.0.2",
+    "phantomjs-prebuilt": "~2.1.4",
+    "requirejs": "^2.2.0",
+    "rimraf": "^2.5.3",
+    "uglify-js": "^2.7.0"
+  }
+}

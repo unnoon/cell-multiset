@@ -1,0 +1,31 @@
+{
+  "name": "cell-multiset",
+  "description": "Fast JS MultiSet implementation.",
+  "main": "src/MultiSet.js",
+  "authors": [
+    "Rogier Geertzema"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "multiset",
+    "bag",
+    "fast"
+  ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node",
+    "es6"
+  ],
+  "homepage": "https://github.com/unnoon/cell-multiset",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "devDependencies": {
+    "benchmark": "^2.1.1",
+    "lodash": "^4.14.0"
+  }
+}
