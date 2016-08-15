@@ -19,7 +19,7 @@ Fast & consistent JavaScript MultiSet (AKA bag, bunch) implementation. Implement
 - Prototypal & Classical inheritance ready
 - Supports amd, node, globals, es6 modules
 - Lots of output options
-- ES6 & ES5 binaries (as well as intermittent version)
+- ES6 & ES5 binaries (as well as intermediate version)
 - Made with bits of love!
 
 ## Installation

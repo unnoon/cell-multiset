@@ -8,8 +8,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * @license      {@link https://github.com/unnoon/cell-multiset/blob/master/LICENSE|MIT License}
  * @overview     Fast JS MultiSet implementation.
  */
-(function (root, multiset) {
-    /*module_type*/ /* istanbul ignore next */switch (true) {
+!function (root, multiset) {
+    /* istanbul ignore next */switch (true) {
         /*amd*/case typeof define === 'function' && root.define === define && !!define.amd:
             define(multiset);break;
         /*node*/case (typeof module === 'undefined' ? 'undefined' : _typeof(module)) === 'object' && root === module.exports:
@@ -17,13 +17,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         /*global*/case !root.MultiSet:
             Object.defineProperty(root, 'MultiSet', { value: multiset(), enumerable: !0 });break;default:
             console.error("'MultiSet' is already defined on root object");}
-    /*es6*/ /*<3*/
-})(undefined, function multiset() {
+}(undefined, function multiset() {
     "use strict";
+    /*es6*/ /*<3*/
 
     extend(MultiSet.prototype, {
         /**
          * @name MultiSet#$info
+         * @type Object
          * @desc
          *       Info object to hold general module information.
          */
@@ -39,7 +40,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          * #
          *         Easy create method for people who use prototypal inheritance.
          *
-         * @param {[Iterable]=} iterable_ - iterable object to initialize the set.
+         * @param {Iterable.<*>=} iterable_ - iterable object to initialize the set.
          *
          * @return {MultiSet} new MultiSet
          */
@@ -51,11 +52,74 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
         },
         /**
+         * @method MultiSet#add
+         * @desc
+         *         Adds one or multiple elements to the multiset. Returns the MultiSet object.
+         *
+         * @param {...any} elms - one or multiple elements to add to the set.
+         *
+         * @returns {MultiSet} this
+         */
+        add: function add() {
+            for (var _len = arguments.length, elms = Array(_len), _key = 0; _key < _len; _key++) {
+                elms[_key] = arguments[_key];
+            }
+
+            for (var i = 0 | 0, max = elms.length, elm; i < max; i++) {
+                elm = elms[i];
+
+                this.elements.set(elm, (this.elements.get(elm) || 0 | 0) + 1 | 0);
+            }
+
+            return this;
+        },
+        /**
+         * @name MultiSet#cardinality
+         * @desc   **aliases:** size
+         * #
+         *       Getter for the cardinality of the set.
+         *       In case of a set it will return a warning.
+         *
+         * @readonly
+         * @type number
+         */
+        get cardinality() {
+            "@aliases: size";
+
+            {
+                var len = 0 | 0;
+
+                this.elements.forEach(function (multiplicity) {
+                    return len += multiplicity;
+                }); // TODO improve speed
+
+                return len;
+            }
+        },
+        set cardinality(val) {
+            console.warn("Cardinality/Size property is readonly.");
+        },
+        /**
+         * @method MultiSet#clear
+         * @desc
+         *         Clears the multiset. Alphabet will be retained though.
+         *         Basically setting all multiplicities to zero.
+         *
+         * @returns {MultiSet} this
+         */
+        clear: function clear() {
+            this.elements.forEach(function (multiplicity, elm, elms) {
+                elms.set(elm, 0 | 0);
+            });
+
+            return this;
+        },
+        /**
          * @method MultiSet#init
          * @desc
          *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
          *
-         * @param {[Iterable]=} elms_ - iterable object to initialize the set.
+         * @param {Iterable.<*>=} elms_ - iterable object to initialize the set.
          *
          * @returns {MultiSet} this
          */
@@ -87,28 +151,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     }
                 }
             }
-        },
-        /**
-         * @method MultiSet#add
-         * @desc
-         *         Adds one or multiple elements to the multiset.
-         *
-         * @param {...any} elms - one or multiple elements to add to the set.
-         *
-         * @returns {MultiSet} this
-         */
-        add: function add() {
-            var elm;
-
-            for (var _len = arguments.length, elms = Array(_len), _key = 0; _key < _len; _key++) {
-                elms[_key] = arguments[_key];
-            }
-
-            for (var i = 0, max = elms.length; i < max; i++) {
-                elm = elms[i];
-
-                this.elements.set(elm, (this.elements.get(elm) || 0) + 1);
-            }
 
             return this;
         },
@@ -128,8 +170,34 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             {
                 return !!this.elements.get(elm);
             }
-        }
+        },
+        /**
+         * @method MultiSet#remove
+         * @desc   **aliases:** delete
+         * #
+         *         Delete one or more elements from the MultiSet. Returns the MultiSet object.
+         *
+         * @param {...any} elms - one or more elements to remove.
+         *
+         * @returns {MultiSet} this
+         */
+        remove: function remove() {
+            "@aliases: delete";
 
+            {
+                for (var _len2 = arguments.length, elms = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                    elms[_key2] = arguments[_key2];
+                }
+
+                for (var i = 0 | 0, max = elms.length, elm; i < max; i++) {
+                    elm = elms[i];
+
+                    this.elements.set(elm, Math.max(0 | 0, this.elements.get(elm) - 1 | 0));
+                }
+
+                return this;
+            }
+        }
     });
 
     /**
@@ -137,7 +205,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * @desc
      *        Fast JS MultiSet implementation.
      *
-     * @param {[Iterable]=} iterable_ - iterable object to initialize the set.
+     * @param {Iterable.<*>=} iterable_ - iterable object to initialize the set.
      *
      * @return {MultiSet} new MultiSet
      */
@@ -158,22 +226,27 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
      * @returns {Object} the object after extension.
      */
     function extend(obj, properties) {
-        for (var prop in properties) {
+        var _loop = function _loop(prop) {
             if (!properties.hasOwnProperty(prop)) {
-                continue;
+                return 'continue';
             }
 
             var dsc = Object.getOwnPropertyDescriptor(properties, prop);
-            var aliases = dsc.value && (dsc.value + '').match(/@aliases:(.*?);/);
+            var aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
             var names = aliases ? aliases[1].match(/[\w\$]+/g) : [];names.unshift(prop);
 
             names.forEach(function (name) {
                 return Object.defineProperty(obj, name, dsc);
             });
+        };
+
+        for (var prop in properties) {
+            var _ret = _loop(prop);
+
+            if (_ret === 'continue') continue;
         }
 
         return obj;
     }
-
-    return MultiSet;
+    return MultiSet.prototype; // prefer prototypal inheritance
 });
