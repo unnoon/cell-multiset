@@ -30,7 +30,7 @@
          * #
          *         Easy create method for people who use prototypal inheritance.
          *
-         * @param {[Iterable]=} iterable_ - iterable object to initialize the set.
+         * @param {Iterable.<*>=} iterable_ - iterable object to initialize the set.
          *
          * @return {MultiSet} new MultiSet
          */
@@ -44,7 +44,7 @@
          * @desc
          *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
          *
-         * @param {[Iterable]=} elms_ - iterable object to initialize the set.
+         * @param {Iterable.<*>=} elms_ - iterable object to initialize the set.
          *
          * @returns {MultiSet} this
          */
@@ -52,14 +52,14 @@
         {
             this.elements = new Map();
 
-            if(elms_) {for(var elm of elms_) {this.add(elm)}}
+            if(elms_) {for(const elm of elms_) {this.add(elm)}}
 
             return this
         },
         /**
          * @method MultiSet#add
          * @desc
-         *         Adds one or multiple elements to the multiset.
+         *         Adds one or multiple elements to the multiset. Returns the MultiSet object.
          *
          * @param {...any} elms - one or multiple elements to add to the set.
          *
@@ -67,9 +67,7 @@
          */
         add: function(...elms)
         {
-            var elm;
-
-            for(let i = 0, max = elms.length; i < max; i++)
+            for(let i = 0|0, max = elms.length, elm; i < max; i++)
             {
                 elm = elms[i];
 
@@ -78,6 +76,30 @@
 
             return this
         },
+        /**
+         * @method MultiSet#remove
+         * @desc   **aliases:** delete
+         * #
+         *         Delete one or more elements from the MultiSet. Returns the MultiSet object.
+         *
+         * @param {...any} elms - one or more elements to remove.
+         *
+         * @returns {MultiSet} this
+         */
+        remove: function(...elms) {
+        "@aliases: delete";
+        {
+            for(let i = 0|0, max = elms.length, elm; i < max; i++)
+            {
+                elm = elms[i];
+
+                if (!this.elements.has(elm)) {continue}
+
+                this.elements.set(elm, Math.max(0, this.elements.get(elm) - 1));
+            }
+
+            return this
+        }},
         /**
          * @method MultiSet#has
          * @desc   **aliases:** isMember
@@ -92,8 +114,28 @@
         "@aliases: isMember";
         {
             return !!this.elements.get(elm)
-        }}
+        }},
+        /**
+         * @readonly
+         * @name MultiSet#size
+         * @type number
+         * @desc
+         *       Getter for the cardinality of the set.
+         *       In case of a set it will return a warning.
+         */
+        get size() {
+        "@aliases: cardinality"; // TODO aliases for getter and setters
+        {
+            let len = 0|0;
 
+            this.elements.forEach(multiplicity => len += multiplicity); // TODO improve
+
+            return len
+        }},
+        set size(val)
+        {
+            console.warn("Length property is readonly.")
+        }
     });
 
     /**
@@ -101,7 +143,7 @@
      * @desc
      *        Fast JS MultiSet implementation.
      *
-     * @param {[Iterable]=} iterable_ - iterable object to initialize the set.
+     * @param {Iterable.<*>=} iterable_ - iterable object to initialize the set.
      *
      * @return {MultiSet} new MultiSet
      */
@@ -122,12 +164,12 @@
      */
     function extend(obj, properties)
     {
-        for(var prop in properties)
+        for(const prop in properties)
         {   if(!properties.hasOwnProperty(prop)) {continue}
 
-            var dsc     = Object.getOwnPropertyDescriptor(properties, prop);
-            var aliases = dsc.value && (dsc.value + '').match(/@aliases:(.*?);/);
-            var names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
+            const dsc     = Object.getOwnPropertyDescriptor(properties, prop);
+            const aliases = dsc.value && (dsc.value + '').match(/@aliases:(.*?);/);
+            const names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
 
             names.forEach(name => Object.defineProperty(obj, name, dsc));
         }
