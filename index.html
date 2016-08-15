@@ -10,8 +10,16 @@
         <script src="src/MultiSet.js"></script>
         <!--<script src="bin/es6/MultiSet.js"></script>-->
         <script>
-            var ms = MultiSet.prototype.$spawn([7, 67, 23]);
+            var ms = MultiSet.$create([7, 7, 67, 23]);
+            var ctx = {max: 8};
+            var sum = 0;
 
+            ms.each((val, multiplicity) => {
+                sum += multiplicity;
+                return val < this.max
+            }, ctx);
+
+            console.log(sum);
             console.log(ms.elements);
         </script>
     </body>

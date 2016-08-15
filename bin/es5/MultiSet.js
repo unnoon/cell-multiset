@@ -1,5 +1,7 @@
 'use strict';
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 /*!
@@ -20,6 +22,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 }(undefined, function multiset() {
     "use strict";
     /*es6*/ /*<3*/
+    // int32 consts
+
+    var zero = 0 | 0;
+    var one = 1 | 0;
 
     extend(MultiSet.prototype, {
         /**
@@ -61,14 +67,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          * @returns {MultiSet} this
          */
         add: function add() {
-            for (var _len = arguments.length, elms = Array(_len), _key = 0; _key < _len; _key++) {
-                elms[_key] = arguments[_key];
-            }
+            var max = arguments.length;
 
-            for (var i = 0 | 0, max = elms.length, elm; i < max; i++) {
-                elm = elms[i];
+            for (var i = zero, elm; i < max; i++) {
+                elm = arguments.length <= i + 0 ? undefined : arguments[i + 0];
 
-                this.elements.set(elm, (this.elements.get(elm) || 0 | 0) + 1 | 0);
+                this.elements.set(elm, (this.elements.get(elm) || zero) + one);
             }
 
             return this;
@@ -87,7 +91,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             "@aliases: size";
 
             {
-                var len = 0 | 0;
+                var len = zero;
 
                 this.elements.forEach(function (multiplicity) {
                     return len += multiplicity;
@@ -109,10 +113,120 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          */
         clear: function clear() {
             this.elements.forEach(function (multiplicity, elm, elms) {
-                elms.set(elm, 0 | 0);
+                elms.set(elm, zero);
             });
 
             return this;
+        },
+        /**
+         * @method MultiSet#each
+         * @desc   **aliases:** forEach
+         * #
+         *         Iterates over the unique elements/keys of the set.
+         *         Can be broken prematurely by returning false.
+         *
+         * @param {function(elm, multiplicity, this)} cb - callback function to be called on each unique element.
+         * @param {Object=}                    ctx_      - context for the callback function.
+         *
+         * @returns {boolean} boolean reflecting the result of the callback function
+         */
+        each: function each(cb, ctx_) {
+            "@aliases: forEach";
+
+            {
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = this.elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var _step$value = _slicedToArray(_step.value, 2);
+
+                        var elm = _step$value[0];
+                        var multiplicity = _step$value[1];
+
+                        if (cb.call(ctx_, elm, multiplicity, this) === false) {
+                            return false;
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+
+                return true;
+            }
+        },
+        /**
+         * @method MultiSet#each
+         * @desc   **aliases:** forEach$, eachAll, forEachAll
+         * #
+         *         Iterates over the all elements of the set. Repeating elements if the multiplicity is higher then 1.
+         *         Can be broken prematurely by returning false.
+         *
+         * @param {function(value, count, this)} cb   - callback function to be called on each element.
+         * @param {Object=}                      ctx_ - context for the callback function.
+         *
+         * @returns {boolean} boolean reflecting the result of the callback function
+         */
+        each$: function each$(cb, ctx_) {
+            "@aliases: forEach$, eachAll, forEachAll";
+
+            {
+                var count = 0;
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                    for (var _iterator2 = this.elements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var _step2$value = _slicedToArray(_step2.value, 2);
+
+                        var elm = _step2$value[0];
+                        var multiplicity = _step2$value[1];
+                        for (var i = 0; i < multiplicity; i++, count++) {
+                            if (cb.call(ctx_, elm, count, this) === false) {
+                                return false;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
+                        }
+                    } finally {
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
+                        }
+                    }
+                }
+
+                return true;
+            }
+        },
+        /**
+         * @method MultiSet#entries
+         * @desc
+         *         A new Iterator object that contains an array of [value, multiplicity] for each element in the given Set, in insertion order.
+         *
+         * @returns {Iterator.<*>}
+         */
+        entries: function entries() {
+            return this.elements.entries();
         },
         /**
          * @method MultiSet#init
@@ -127,26 +241,26 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             this.elements = new Map();
 
             if (elms_) {
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator = elms_[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var elm = _step.value;
+                    for (var _iterator3 = elms_[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var elm = _step3.value;
                         this.add(elm);
                     }
                 } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
                         }
                     } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
                         }
                     }
                 }
@@ -172,6 +286,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
         },
         /**
+         * @method MultiSet#keys
+         * @desc
+         *         Returns a new Iterator object that contains the unique elements in the Set object in insertion order.
+         *
+         * @returns {Iterator.<*>}
+         */
+        keys: function keys() {
+            {
+                return this.elements.keys();
+            }
+        },
+        /**
          * @method MultiSet#remove
          * @desc   **aliases:** delete
          * #
@@ -185,19 +311,23 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             "@aliases: delete";
 
             {
-                for (var _len2 = arguments.length, elms = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                    elms[_key2] = arguments[_key2];
-                }
+                var max = arguments.length;
 
-                for (var i = 0 | 0, max = elms.length, elm; i < max; i++) {
-                    elm = elms[i];
+                for (var i = zero, elm; i < max; i++) {
+                    elm = arguments.length <= i + 0 ? undefined : arguments[i + 0];
 
-                    this.elements.set(elm, Math.max(0 | 0, this.elements.get(elm) - 1 | 0));
+                    this.elements.set(elm, Math.max(zero, this.elements.get(elm) - one));
                 }
 
                 return this;
             }
         }
+        //,
+        // TODO create custom iterable object
+        // values: function()
+        // {
+        //
+        // }
     });
 
     /**

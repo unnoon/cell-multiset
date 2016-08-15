@@ -105,6 +105,121 @@ define([
             });
         });
 
+        describe("each/forEach", function() {
+
+            it("should iterate over the alphabet of the set", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var sum = 0;
+
+                ms.each((val, multiplicity) => {sum += multiplicity});
+
+                expect(sum).to.eql(4);
+            });
+
+            it("should be able to call the alias forEach", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var sum = 0;
+
+                ms.forEach((val, multiplicity) => {sum += multiplicity});
+
+                expect(sum).to.eql(4);
+            });
+
+            it("should be able to change the context of the callback function or break prematurely", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ctx = {max: 8};
+                var sum = 0;
+
+                // Don't use shorthand functions in this case, or the context is immutably this.
+                ms.each(function(val, multiplicity) {if(val > this.max) {return false} sum += multiplicity}, ctx);
+
+                expect(sum).to.eql(2);
+            });
+        });
+
+        describe("each$/forEach$/eachAll/forEachAll", function() {
+
+            it("should iterate over all elements including repetitions", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var sum                 = 0;
+                var multiplicityOfSeven = 0;
+
+                ms.each$(elm => {sum++; if(elm === 7) {multiplicityOfSeven++}});
+
+                expect(sum).to.eql(4);
+                expect(multiplicityOfSeven).to.eql(2);
+            });
+
+            it("should be possible to use its aliases forEach$/eachAll/forEachAll", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var sum                 = 0;
+                var multiplicityOfSeven = 0;
+
+                ms.forEach$(  elm => {sum++; if(elm === 7) {multiplicityOfSeven++}});
+                ms.eachAll(   elm => {sum++; if(elm === 7) {multiplicityOfSeven++}});
+                ms.forEachAll(elm => {sum++; if(elm === 7) {multiplicityOfSeven++}});
+
+                expect(sum).to.eql(12);
+                expect(multiplicityOfSeven).to.eql(6);
+            });
+
+            it("should be able to change the context of the callback function or break prematurely", function() {
+
+                var ms = MultiSet.$create([56, 7, 7, 7, 7, 67, 23]);
+
+                var ctx = {max: 4};
+                var sum = 0;
+                var multiplicityOfSeven = 0;
+
+                // Don't use shorthand functions in this case, or the context is immutably this.
+                ms.each$(function(elm, count) {
+                    sum++;
+                    if(elm === 7) {multiplicityOfSeven++}
+                    return count < (this.max-1)
+                }, ctx);
+
+                expect(sum).to.eql(4);
+                expect(multiplicityOfSeven).to.eql(3);
+            });
+        });
+
+        describe("entries", function() {
+
+            it("should output an iterable object containing value & multiplicity", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var setIter = ms.entries();
+
+                expect(setIter.next().value).to.eql([ 7, 2]);
+                expect(setIter.next().value).to.eql([67, 1]);
+                expect(setIter.next().value).to.eql([23, 1]);
+            });
+        });
+
+        describe("keys", function() {
+
+            it("should return all unique elements", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var setIter = ms.keys();
+
+                expect(setIter.next().value).to.eql(7);
+                expect(setIter.next().value).to.eql(67);
+                expect(setIter.next().value).to.eql(23);
+            });
+        });
+
         describe("remove/delete", function() {
 
             it("should be possible to remove multiple elements", function() {
@@ -114,6 +229,20 @@ define([
                 expect(ms.has(7)).to.be.false;
                 expect(ms.has(67)).to.be.true;
                 expect(ms.has(23)).to.be.false;
+            });
+        });
+
+        describe("keys", function() {
+
+            it("should return all unique elements", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var setIter = ms.keys();
+
+                expect(setIter.next().value).to.eql(7);
+                expect(setIter.next().value).to.eql(67);
+                expect(setIter.next().value).to.eql(23);
             });
         });
     });

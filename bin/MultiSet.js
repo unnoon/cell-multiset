@@ -11,6 +11,9 @@
 /*global*/ case !root.MultiSet                                                          : Object.defineProperty(root, 'MultiSet', {value: multiset(), enumerable: !0}); break; default : console.error("'MultiSet' is already defined on root object")}
 }(this, function multiset() { "use strict";
 /*es6*//*<3*/
+// int32 consts
+const zero = 0|0;
+const one  = 1|0;
 
 extend(MultiSet.prototype, {
     /**
@@ -51,11 +54,13 @@ extend(MultiSet.prototype, {
      */
     add: function(...elms)
     {
-        for(let i = 0|0, max = elms.length, elm; i < max; i++)
+        const max = elms.length;
+
+        for(let i = zero, elm; i < max; i++)
         {
             elm = elms[i];
 
-            this.elements.set(elm, (this.elements.get(elm) || 0|0) + 1|0);
+            this.elements.set(elm, (this.elements.get(elm) || zero) + one);
         }
 
         return this
@@ -73,7 +78,7 @@ extend(MultiSet.prototype, {
     get cardinality() {
     "@aliases: size";
     {
-        let len = 0|0;
+        let len = zero;
 
         this.elements.forEach(multiplicity => len += multiplicity); // TODO improve speed
 
@@ -93,9 +98,67 @@ extend(MultiSet.prototype, {
      */
     clear: function()
     {
-        this.elements.forEach((multiplicity, elm, elms) => {elms.set(elm, 0|0)});
+        this.elements.forEach((multiplicity, elm, elms) => {elms.set(elm, zero)});
 
         return this
+    },
+    /**
+     * @method MultiSet#each
+     * @desc   **aliases:** forEach
+     * #
+     *         Iterates over the unique elements/keys of the set.
+     *         Can be broken prematurely by returning false.
+     *
+     * @param {function(elm, multiplicity, this)} cb - callback function to be called on each unique element.
+     * @param {Object=}                    ctx_      - context for the callback function.
+     *
+     * @returns {boolean} boolean reflecting the result of the callback function
+     */
+    each: function(cb, ctx_) {
+    "@aliases: forEach";
+    {
+        for(let [elm, multiplicity] of this.elements)
+        {
+            if(cb.call(ctx_, elm, multiplicity, this) === false) {return false}
+        }
+
+        return true
+    }},
+    /**
+     * @method MultiSet#each
+     * @desc   **aliases:** forEach$, eachAll, forEachAll
+     * #
+     *         Iterates over the all elements of the set. Repeating elements if the multiplicity is higher then 1.
+     *         Can be broken prematurely by returning false.
+     *
+     * @param {function(value, count, this)} cb   - callback function to be called on each element.
+     * @param {Object=}                      ctx_ - context for the callback function.
+     *
+     * @returns {boolean} boolean reflecting the result of the callback function
+     */
+    each$: function(cb, ctx_) {
+    "@aliases: forEach$, eachAll, forEachAll";
+    {
+        let count = 0;
+        for(let [elm, multiplicity] of this.elements)
+        {   for(let i = 0; i < multiplicity; i++, count++)
+            {
+                if(cb.call(ctx_, elm, count, this) === false) {return false}
+            }
+        }
+
+        return true
+    }},
+    /**
+     * @method MultiSet#entries
+     * @desc
+     *         A new Iterator object that contains an array of [value, multiplicity] for each element in the given Set, in insertion order.
+     *
+     * @returns {Iterator.<*>}
+     */
+    entries: function()
+    {
+        return this.elements.entries();
     },
     /**
      * @method MultiSet#init
@@ -130,6 +193,17 @@ extend(MultiSet.prototype, {
         return !!this.elements.get(elm)
     }},
     /**
+     * @method MultiSet#keys
+     * @desc
+     *         Returns a new Iterator object that contains the unique elements in the Set object in insertion order.
+     *
+     * @returns {Iterator.<*>}
+     */
+    keys: function() {
+    {
+        return this.elements.keys();
+    }},
+    /**
      * @method MultiSet#remove
      * @desc   **aliases:** delete
      * #
@@ -142,15 +216,23 @@ extend(MultiSet.prototype, {
     remove: function(...elms) {
     "@aliases: delete";
     {
-        for(let i = 0|0, max = elms.length, elm; i < max; i++)
+        const max = elms.length;
+
+        for(let i = zero, elm; i < max; i++)
         {
             elm = elms[i];
 
-            this.elements.set(elm, Math.max(0|0, this.elements.get(elm) - 1|0));
+            this.elements.set(elm, Math.max(zero, this.elements.get(elm) - one));
         }
 
         return this
     }}
+    //,
+    // TODO create custom iterable object
+    // values: function()
+    // {
+    //
+    // }
 });
 
 /**
