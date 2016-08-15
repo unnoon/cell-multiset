@@ -52,7 +52,7 @@
         {
             this.elements = new Map();
 
-            if(elms_) {for(const elm of elms_) {this.add(elm)}}
+            if(elms_) {for(let elm of elms_) {this.add(elm)}}
 
             return this
         },
@@ -164,7 +164,7 @@
      */
     function extend(obj, properties)
     {
-        for(const prop in properties)
+        for(let prop in properties)
         {   if(!properties.hasOwnProperty(prop)) {continue}
 
             const dsc     = Object.getOwnPropertyDescriptor(properties, prop);
