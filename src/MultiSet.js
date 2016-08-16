@@ -16,7 +16,7 @@
 const zero = 0|0;
 const one  = 1|0;
 
-extend(MultiSet.prototype, {
+const properties = {
     /**
      * @name MultiSet#$info
      * @type Object
@@ -298,28 +298,34 @@ extend(MultiSet.prototype, {
     {
         return this.values()
     }
-});
+};
 
-/**
- * @class MultiSet
- * @desc
- *        Fast JS MultiSet implementation.
- *        'class' stuff...
- *
- * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
- *
- * @return {MultiSet} new MultiSet
- */
-function MultiSet(iterable=void 0) {
-{
-    this.init(iterable);
-}}
-/**
- * @method MultiSet.[@@species]
- * @desc
- *              The constructor function that is used to create derived objects.
- */
-MultiSet[Symbol.species] = MultiSet;
+class MultiSet {
+    /**
+     * @constructor MultiSet
+     * @desc
+     *        Fast JS MultiSet implementation.
+     *        'class' stuff...
+     *
+     * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
+     *
+     * @return {MultiSet} new MultiSet
+     */
+    constructor(iterable=void 0)
+    {
+        this.init(iterable);
+    }
+    /**
+     * @method MultiSet.[@@species]
+     * @desc
+     *         The constructor function that is used to create derived objects.
+     */
+    static get [Symbol.species]() {
+        return constructor;
+    }
+}
+
+extend(MultiSet.prototype, properties);
 
 /**
  * @func extend
@@ -336,11 +342,10 @@ function extend(obj, properties)
     for(let prop in properties)
     {   if(!properties.hasOwnProperty(prop)) {continue}
 
-        const dsc     = Object.getOwnPropertyDescriptor(properties, prop);
-        const aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
-        const names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
-        const tmp     = prop.match(/@@([\w\$]+)/);
-        const symbol  = tmp ? tmp[1] : '';
+        let dsc     = Object.getOwnPropertyDescriptor(properties, prop);
+        let aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
+        let names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
+        let symbol  = prop.match(/@@([\w\$]+)/); symbol = symbol ? symbol[1] : '';
 
         names.forEach(name => {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}});
     }
