@@ -11,13 +11,13 @@
         <!--<script src="bin/es6/MultiSet.js"></script>-->
         <script>
             var ms = MultiSet.$create([7, 7, 67, 23]);
-            var ctx = {max: 8};
+
             var sum = 0;
 
-            ms.each((val, multiplicity) => {
-                sum += multiplicity;
-                return val < this.max
-            }, ctx);
+            for(let elm of ms)
+            {
+                sum += elm
+            }
 
             console.log(sum);
             console.log(ms.elements);

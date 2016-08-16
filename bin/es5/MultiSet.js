@@ -4,6 +4,8 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /*!
  * @author       Rogier Geertzema
  * @copyright    2016 Rogier Geertzema
@@ -27,7 +29,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     var zero = 0 | 0;
     var one = 1 | 0;
 
-    extend(MultiSet.prototype, {
+    extend(MultiSet.prototype, _defineProperty({
         /**
          * @name MultiSet#$info
          * @type Object
@@ -46,7 +48,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          * #
          *         Easy create method for people who use prototypal inheritance.
          *
-         * @param {Iterable.<*>=} iterable_ - iterable object to initialize the set.
+         * @param {Iterable.<any>=} iterable_ - iterable object to initialize the set.
          *
          * @return {MultiSet} new MultiSet
          */
@@ -101,7 +103,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
         },
         set cardinality(val) {
-            console.warn("Cardinality/Size property is readonly.");
+            console.warn(".cardinality/.size property is readonly.");
         },
         /**
          * @method MultiSet#clear
@@ -221,19 +223,36 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         /**
          * @method MultiSet#entries
          * @desc
-         *         A new Iterator object that contains an array of [value, multiplicity] for each element in the given Set, in insertion order.
+         *         A new Iterator object that contains an array of [elm, multiplicity] for each element in the given Set, in insertion order.
          *
-         * @returns {Iterator.<*>}
+         * @returns {Iterator.<any>}
          */
         entries: function entries() {
             return this.elements.entries();
+        },
+        /**
+         * @method MultiSet#get
+         * @desc   **aliases:** multiplicityOf
+         * #
+         *         Map style getter to return the multiplicity of an element. undefined if the element is not in the set.
+         *
+         * @param {any} elm - element to retrieve the multiplicity for.
+         *
+         * @returns {int|undefined} the multiplicity of the element. undefined if not a member of the set.
+         */
+        get: function get(elm) {
+            "@aliases: multiplicityOf";
+
+            {
+                return this.elements.get(elm);
+            }
         },
         /**
          * @method MultiSet#init
          * @desc
          *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
          *
-         * @param {Iterable.<*>=} elms_ - iterable object to initialize the set.
+         * @param {Iterable.<any>=} elms_ - iterable object to initialize the set.
          *
          * @returns {MultiSet} this
          */
@@ -290,7 +309,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
          * @desc
          *         Returns a new Iterator object that contains the unique elements in the Set object in insertion order.
          *
-         * @returns {Iterator.<*>}
+         * @returns {Iterator.<any>}
          */
         keys: function keys() {
             {
@@ -321,21 +340,77 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
                 return this;
             }
+        },
+        /**
+         * @method MultiSet#toArray
+         * @desc
+         *         Returns a simple array containing all elements including repeating elements.
+         *
+         * @returns {Array}
+         */
+        toArray: function toArray() {
+            var arr = [];
+
+            this.each$(function (val) {
+                return arr.push(val);
+            });
+
+            return arr;
+        },
+        /**
+         * @method MultiSet#toString
+         * @desc   **aliases:** stringify
+         * #
+         *         Stringifies the MultiSet in simple array style.
+         *
+         * @returns {string}
+         */
+        toString: function toString() {
+            "@aliases: stringify";
+
+            {
+                var out = '';
+
+                out += '[';this.each$(function (elm) {
+                    out += (out !== '[' ? ', ' : '') + elm;
+                });out += ']';
+
+                return out;
+            }
+        },
+        /**
+         * @method MultiSet#values
+         * @desc
+         *         Returns a new Iterator object that contains the values for each element, including repetitions, in the MultiSet object in insertion order.
+         *
+         * @returns {Iterator.<any>}
+         */
+        values: function values() {
+            return regeneratorRuntime.mark(function _callee(data) {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                return _context.delegateYield(data.toArray(), 't0', 1);
+
+                            case 1:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            })(this);
         }
-        //,
-        // TODO create custom iterable object
-        // values: function()
-        // {
-        //
-        // }
-    });
+    }, '@@iterator', function iterator() {
+        return this.values();
+    }));
 
     /**
      * @class MultiSet
      * @desc
      *        Fast JS MultiSet implementation.
      *
-     * @param {Iterable.<*>=} iterable_ - iterable object to initialize the set.
+     * @param {Iterable.<any>=} iterable_ - iterable object to initialize the set.
      *
      * @return {MultiSet} new MultiSet
      */
@@ -364,9 +439,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             var dsc = Object.getOwnPropertyDescriptor(properties, prop);
             var aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
             var names = aliases ? aliases[1].match(/[\w\$]+/g) : [];names.unshift(prop);
+            var tmp = prop.match(/@@([\w\$]+)/);
+            var symbol = tmp ? tmp[1] : '';
 
             names.forEach(function (name) {
-                return Object.defineProperty(obj, name, dsc);
+                if (symbol) {
+                    obj[Symbol[symbol]] = dsc.value;
+                } else {
+                    Object.defineProperty(obj, name, dsc);
+                }
             });
         };
 

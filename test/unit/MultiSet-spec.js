@@ -88,7 +88,7 @@ define([
 
                 ms.size = 6;
 
-                expect(console.warn.calledWith("Cardinality/Size property is readonly.")).to.be.true;
+                expect(console.warn.calledWith(".cardinality/.size property is readonly.")).to.be.true;
             });
         });
 
@@ -206,6 +206,18 @@ define([
             });
         });
 
+        describe("get/multiplicityOf", function() {
+
+            it("should return the multiplicity of an element", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                expect(ms.get(7)).to.eql(2);
+                expect(ms.multiplicityOf(67)).to.eql(1);
+                expect(ms.get('ndef')).to.eql(undefined);
+            });
+        });
+
         describe("keys", function() {
 
             it("should return all unique elements", function() {
@@ -232,17 +244,54 @@ define([
             });
         });
 
-        describe("keys", function() {
+        describe("toArray", function() {
 
-            it("should return all unique elements", function() {
+            it("should output all elements including repetitions", function() {
+
+                var ms = MultiSet.$create().add(7, 7, 7, 67, 23, 8).remove(23);
+
+                expect(ms.toArray()).to.eql([7, 7, 7, 67, 8]);
+            });
+        });
+
+        describe("toString/stringify", function() {
+
+            it("should output all elements, including repetitions, as a string", function() {
+
+                var ms = MultiSet.$create().add(7, 7, 7, 67, 23, 8).remove(23);
+
+                expect(ms.toString()).to.eql('[7, 7, 7, 67, 8]');
+            });
+        });
+
+        describe("values", function() {
+
+            it("should return all, including repeating, elements", function() {
 
                 var ms = MultiSet.$create([7, 7, 67, 23]);
 
-                var setIter = ms.keys();
+                var setIter = ms.values();
 
                 expect(setIter.next().value).to.eql(7);
+                expect(setIter.next().value).to.eql(7);
                 expect(setIter.next().value).to.eql(67);
-                expect(setIter.next().value).to.eql(23);
+            });
+        });
+
+        describe("[@@iterator]", function() {
+
+            it("should return all, including repeating, elements", function() {
+
+                var ms = MultiSet.$create([7, 7, 67, 23]);
+
+                var sum = 0;
+
+                for(let elm of ms)
+                {
+                    sum += elm
+                }
+
+                expect(sum).to.eql(104);
             });
         });
     });
