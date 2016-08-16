@@ -304,6 +304,7 @@ extend(MultiSet.prototype, {
  * @class MultiSet
  * @desc
  *        Fast JS MultiSet implementation.
+ *        'class' stuff...
  *
  * @param {Iterable.<any>=} iterable_ - iterable object to initialize the set.
  *
@@ -313,7 +314,8 @@ function MultiSet(iterable_) {
 {
     this.init(iterable_);
 }}
-
+MultiSet[Symbol.species] = MultiSet;
+Object.defineProperty(MultiSet, 'length', {value: 0});
 /**
  * @func extend
  * @desc
