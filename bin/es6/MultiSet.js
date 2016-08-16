@@ -12,7 +12,7 @@ export default MultiSet.prototype
 const zero = 0|0;
 const one  = 1|0;
 
-extend(MultiSet.prototype, {
+const properties = {
     /**
      * @name MultiSet#$info
      * @type Object
@@ -31,14 +31,14 @@ extend(MultiSet.prototype, {
      * #
      *         Easy create method for people who use prototypal inheritance.
      *
-     * @param {Iterable.<any>=} iterable_ - iterable object to initialize the set.
+     * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
      *
      * @return {MultiSet} new MultiSet
      */
-    $create: function(iterable_) {
+    $create: function(iterable=void 0) {
     "@aliases: $spawn";
     {
-        return Object.create(MultiSet.prototype).init(iterable_);
+        return Object.create(MultiSet.prototype).init(iterable);
     }},
     /**
      * @method MultiSet#add
@@ -107,16 +107,16 @@ extend(MultiSet.prototype, {
      *         Can be broken prematurely by returning false.
      *
      * @param {function(elm, multiplicity, this)} cb - callback function to be called on each unique element.
-     * @param {Object=}                    ctx_      - context for the callback function.
+     * @param {Object=}                    ctx      - context for the callback function.
      *
      * @returns {boolean} boolean reflecting the result of the callback function
      */
-    each: function(cb, ctx_) {
+    each: function(cb, ctx=null) {
     "@aliases: forEach";
     {
         for(let [elm, multiplicity] of this.elements)
         {
-            if(cb.call(ctx_, elm, multiplicity, this) === false) {return false}
+            if(cb.call(ctx, elm, multiplicity, this) === false) {return false}
         }
 
         return true
@@ -129,18 +129,18 @@ extend(MultiSet.prototype, {
      *         Can be broken prematurely by returning false.
      *
      * @param {function(value, count, this)} cb   - callback function to be called on each element.
-     * @param {Object=}                      ctx_ - context for the callback function.
+     * @param {Object=}                      ctx - context for the callback function.
      *
      * @returns {boolean} boolean reflecting the result of the callback function
      */
-    each$: function(cb, ctx_) {
+    each$: function(cb, ctx=null) {
     "@aliases: forEach$, eachAll, forEachAll";
     {
         let count = 0;
         for(let [elm, multiplicity] of this.elements)
         {   for(let i = 0; i < multiplicity; i++, count++)
             {
-                if(cb.call(ctx_, elm, count, this) === false) {return false}
+                if(cb.call(ctx, elm, count, this) === false) {return false}
             }
         }
 
@@ -177,15 +177,15 @@ extend(MultiSet.prototype, {
      * @desc
      *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
      *
-     * @param {Iterable.<any>=} elms_ - iterable object to initialize the set.
+     * @param {Iterable.<any>=} elms - iterable object to initialize the set.
      *
      * @returns {MultiSet} this
      */
-    init: function(elms_)
+    init: function(elms=void 0)
     {
         this.elements = new Map();
 
-        if(elms_) {for(let elm of elms_) {this.add(elm)}}
+        if(elms) {for(let elm of elms) {this.add(elm)}}
 
         return this
     },
@@ -294,21 +294,34 @@ extend(MultiSet.prototype, {
     {
         return this.values()
     }
-});
+};
 
-/**
- * @class MultiSet
- * @desc
- *        Fast JS MultiSet implementation.
- *
- * @param {Iterable.<any>=} iterable_ - iterable object to initialize the set.
- *
- * @return {MultiSet} new MultiSet
- */
-function MultiSet(iterable_) {
-{
-    this.init(iterable_);
-}}
+class MultiSet {
+    /**
+     * @constructor MultiSet
+     * @desc
+     *        Fast JS MultiSet implementation.
+     *        'class' stuff...
+     *
+     * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
+     *
+     * @return {MultiSet} new MultiSet
+     */
+    constructor(iterable=void 0)
+    {
+        this.init(iterable);
+    }
+    /**
+     * @method MultiSet.[@@species]
+     * @desc
+     *         The constructor function that is used to create derived objects.
+     */
+    static get [Symbol.species]() {
+        return constructor;
+    }
+}
+
+extend(MultiSet.prototype, properties);
 
 /**
  * @func extend
@@ -325,13 +338,12 @@ function extend(obj, properties)
     for(let prop in properties)
     {   if(!properties.hasOwnProperty(prop)) {continue}
 
-        const dsc     = Object.getOwnPropertyDescriptor(properties, prop);
-        const aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
-        const names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
-        const tmp     = prop.match(/@@([\w\$]+)/);
-        const symbol  = tmp ? tmp[1] : '';
+        let dsc     = Object.getOwnPropertyDescriptor(properties, prop);
+        let aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
+        let names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
+        let symbol  = prop.match(/@@([\w\$]+)/); symbol = symbol ? symbol[1] : '';
 
-        names.forEach(name => {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Object.defineProperty(obj, name, dsc)}});
+        names.forEach(name => {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}});
     }
 
     return obj
