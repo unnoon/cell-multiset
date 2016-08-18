@@ -68,7 +68,7 @@ const properties = {
     },
     /**
      * @name MultiSet#cardinality
-     * @desc   **aliases:** size
+     * @desc **aliases:** size
      * #
      *       Getter for the cardinality of the set.
      *       In case of a set it will return a warning.
@@ -92,14 +92,13 @@ const properties = {
     /**
      * @method MultiSet#clear
      * @desc
-     *         Clears the multiset. Alphabet will be retained though.
-     *         Basically setting all multiplicities to zero.
+     *         Clears the multiset.
      *
      * @returns {MultiSet} this
      */
     clear: function()
     {
-        this.elements.forEach((multiplicity, elm, elms) => {elms.set(elm, zero)});
+        this.elements.clear();
 
         return this
     },
@@ -234,30 +233,17 @@ const properties = {
     {
         const max = elms.length;
 
-        for(let i = zero, elm; i < max; i++)
+        for(let i = zero, elm, multiplicity; i < max; i++)
         {
-            elm = elms[i];
+            elm          = elms[i];
+            multiplicity = this.elements.get(elm);
 
-            this.elements.set(elm, Math.max(zero, this.elements.get(elm) - one));
+            if(multiplicity === 1) {this.elements.delete(elm)}
+            else                   {this.elements.set(elm, Math.max(zero, --multiplicity))}
         }
 
         return this
     }},
-    /**
-     * @method MultiSet#toArray
-     * @desc
-     *         Returns a simple array containing all elements including repeating elements.
-     *
-     * @returns {Array}
-     */
-    toArray: function()
-    {
-        var arr = [];
-
-        this.each$(val => arr.push(val));
-
-        return arr
-    },
     /**
      * @method MultiSet#toString
      * @desc   **aliases:** stringify
@@ -266,12 +252,17 @@ const properties = {
      *
      * @returns {string}
      */
-    toString: function() {
+    toString: function(mode) {
     "@aliases: stringify";
     {
         var out = '';
 
-        out += '['; this.each$(elm => {out += (out !== '[' ? ', ' : '') + elm}); out += ']';
+        switch(mode)
+        {
+            case -1 : break;// TODO formal representation & unit tests
+            case  1 : out += '['; this.each$(elm => {out += (out !== '[' ? ', ' : '') + elm}); out += ']'; break;
+            default : out += '{'; this.each((elm, mul) => {out += (out !== '{' ? ', ' : '') + elm + ' => ' + mul}); out += '}'; break; // TODO use string literals
+        }
 
         return out
     }},
@@ -284,20 +275,25 @@ const properties = {
      */
     values: function()
     {
-        return (function*(data) {yield* data.toArray()})(this)
+        let data = [];
+
+        this.each$(val => data.push(val));
+
+        return (function*(data) {yield* data})(data)
     },
     /**
      * @method MultiSet#[@@iterator]
      * @desc
      *         Prototype Symbol.iterator to make MultiSet iterable.
-     *         Returns a new Iterator object that contains the values for each element, including repetitions, in the MultiSet object in insertion order.
+     *         Returns a new Iterator object that contains the [value, multiplicity] for each element, in the MultiSet object in insertion order.
      *
      * @returns {Iterator.<any>}
      */
     ['@@iterator']: function()
     {
-        return this.values()
-    }
+        return this.elements.entries();
+    },
+    ['@@toStringTag']: 'MultiSet'
 };
 
 class MultiSet {

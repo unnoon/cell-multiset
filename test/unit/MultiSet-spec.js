@@ -244,23 +244,13 @@ define([
             });
         });
 
-        describe("toArray", function() {
-
-            it("should output all elements including repetitions", function() {
-
-                var ms = MultiSet.$create().add(7, 7, 7, 67, 23, 8).remove(23);
-
-                expect(ms.toArray()).to.eql([7, 7, 7, 67, 8]);
-            });
-        });
-
         describe("toString/stringify", function() {
 
-            it("should output all elements, including repetitions, as a string", function() {
+            it("should output all elements, including repetitions, as a string if mode is 1", function() {
 
                 var ms = MultiSet.$create().add(7, 7, 7, 67, 23, 8).remove(23);
 
-                expect(ms.toString()).to.eql('[7, 7, 7, 67, 8]');
+                expect(ms.toString(1)).to.eql('[7, 7, 7, 67, 8]');
             });
         });
 
@@ -284,14 +274,17 @@ define([
 
                 var ms = MultiSet.$create([7, 7, 67, 23]);
 
-                var sum = 0;
+                var keySum          = 0;
+                var multiplicitySum = 0;
 
-                for(let elm of ms)
+                for(let [value, multiplicity] of ms)
                 {
-                    sum += elm
+                    keySum          += value;
+                    multiplicitySum += multiplicity;
                 }
 
-                expect(sum).to.eql(104);
+                expect(keySum).to.eql(97);
+                expect(multiplicitySum).to.eql(4);
             });
         });
     });
