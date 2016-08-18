@@ -101,7 +101,7 @@ define([
                 ms.clear();
 
                 expect(ms.size).to.eql(0);
-                expect(ms.elements.size).to.eql(3);
+                expect(ms.elements.size).to.eql(0);
             });
         });
 
