@@ -18,20 +18,20 @@ const one  = 1|0;
 
 const properties = {
     /**
-     * @name MultiSet#$info
+     * @name MultiSet.info
      * @type Object
      * @desc
      *       Info object to hold general module information.
      */
-    $info: {
+    'static info': {
         "name"       : "cell-multiset",
         "description": "Fast JS MultiSet implementation.",
         "version"    : "/*?= VERSION */",
         "url"        : "https://github.com/unnoon/cell-multiset"
     },
     /**
-     * @method MultiSet#$create
-     * @desc   **aliases:** $spawn
+     * @method MultiSet.create
+     * @desc   **aliases:** spawn
      * #
      *         Easy create method for people who use prototypal inheritance.
      *
@@ -39,8 +39,8 @@ const properties = {
      *
      * @return {MultiSet} new MultiSet
      */
-    $create: function(iterable=void 0) {
-    "@aliases: $spawn";
+    'static create': function(iterable=void 0) {
+    "@aliases: spawn";
     {
         return Object.create(MultiSet.prototype).init(iterable);
     }},
@@ -293,40 +293,42 @@ const properties = {
     {
         return this.elements.entries();
     },
-    ['@@toStringTag']: 'MultiSet'
+    /**
+     * @name MultiSet#[@@toStringTag]
+     * @type string
+     * @desc
+     *       Custom name for typeof.
+     */
+    ['@@toStringTag']: 'MultiSet',
+    /**
+     * @name MultiSet.[@@species]
+     * @type function
+     * @desc
+     *       the species of the MultiSet. Which is just the MultiSet constructor.
+     */
+    ['static @@species']: MultiSet
 };
-
-class MultiSet {
-    /**
-     * @constructor MultiSet
-     * @desc
-     *        Fast JS MultiSet implementation.
-     *        'class' stuff...
-     *
-     * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
-     *
-     * @return {MultiSet} new MultiSet
-     */
-    constructor(iterable=void 0)
-    {
-        this.init(iterable);
-    }
-    /**
-     * @method MultiSet.[@@species]
-     * @desc
-     *         The constructor function that is used to create derived objects.
-     */
-    static get [Symbol.species]() {
-        return constructor;
-    }
+/**
+ * @constructor MultiSet
+ * @desc
+ *        Fast JS MultiSet implementation.
+ *        'class' stuff...
+ *
+ * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
+ *
+ * @return {MultiSet} new MultiSet
+ */
+function MultiSet(iterable=void 0)
+{
+    this.init(iterable);
 }
 
-extend(MultiSet.prototype, properties);
+extend(MultiSet, properties);
 
 /**
  * @func extend
  * @desc
- *       Very simple extend function including alias support.
+ *       Very simple extend function including alias, static support.
  *
  * @param {Object} obj        - object to extend.
  * @param {Object} properties - object with the extend properties.
@@ -338,12 +340,17 @@ function extend(obj, properties)
     for(let prop in properties)
     {   if(!properties.hasOwnProperty(prop)) {continue}
 
-        let dsc     = Object.getOwnPropertyDescriptor(properties, prop);
-        let aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
-        let names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
-        let symbol  = prop.match(/@@([\w\$]+)/); symbol = symbol ? symbol[1] : '';
+        let dsc      = Object.getOwnPropertyDescriptor(properties, prop);
+        let attrs    = prop.match(/[\w\$\@]+/g); prop = attrs[attrs.length-1]; attrs.pop();
+        let aliases  = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
+        let names    = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
+        let symbol   = prop.match(/@@(.+)/); symbol = symbol ? symbol[1] : '';
+        let addProp  = function(obj, name) {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}};
 
-        names.forEach(name => {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}});
+        names.forEach(name => {
+            if(~attrs.indexOf('static')) {addProp(obj, name)}
+            addProp(obj.prototype, name);
+        });
     }
 
     return obj

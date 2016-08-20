@@ -8,7 +8,7 @@ define([
 
             it("should demonstrate the basic functions of cell-multiset", function() {
 
-                var ms = MultiSet.$spawn([7, 67, 23]);
+                var ms = MultiSet.spawn([7, 67, 23]);
 
                 expect(ms.has(7)).to.be.true;
                 expect(ms.has(67)).to.be.true;
@@ -37,20 +37,20 @@ define([
             });
         });
 
-        describe("$create/$spawn", function() {
+        describe("$create/spawn", function() {
 
             it("should create a new multiset", function() {
 
-                var ms = MultiSet.$create([7, 67, 23]);
+                var ms = MultiSet.create([7, 67, 23]);
 
                 expect(ms.has(7)).to.be.true;
                 expect(ms.has(67)).to.be.true;
                 expect(ms.has(23)).to.be.true;
             });
 
-            it("should be able to construct an empty multi-set using its alias $spawn", function() {
+            it("should be able to construct an empty multi-set using its alias spawn", function() {
 
-                var ms = MultiSet.$create();
+                var ms = MultiSet.create();
 
                 expect(ms.size).to.eql(0);
             });
@@ -60,7 +60,7 @@ define([
 
             it("should be possible to add multiple elements", function() {
 
-                var ms = MultiSet.$create().add(7, 67, 23);
+                var ms = MultiSet.create().add(7, 67, 23);
 
                 expect(ms.has(7)).to.be.true;
                 expect(ms.has(67)).to.be.true;
@@ -72,7 +72,7 @@ define([
 
             it("should return the cardinality of the set", function() {
 
-                var ms = MultiSet.$create();
+                var ms = MultiSet.create();
 
                 expect(ms.size).to.eql(0);
                 expect(ms.cardinality).to.eql(0);
@@ -84,7 +84,7 @@ define([
 
             it("should return a warning in case of a set", function() {
 
-                var ms = MultiSet.$create();
+                var ms = MultiSet.create();
 
                 ms.size = 6;
 
@@ -94,9 +94,9 @@ define([
 
         describe("clear", function() {
 
-            it("should clear the set. Alphabet will be retained though", function() {
+            it("should clear the set.", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 ms.clear();
 
@@ -109,7 +109,7 @@ define([
 
             it("should iterate over the alphabet of the set", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var sum = 0;
 
@@ -120,7 +120,7 @@ define([
 
             it("should be able to call the alias forEach", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var sum = 0;
 
@@ -131,7 +131,7 @@ define([
 
             it("should be able to change the context of the callback function or break prematurely", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
                 var ctx = {max: 8};
                 var sum = 0;
 
@@ -146,7 +146,7 @@ define([
 
             it("should iterate over all elements including repetitions", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var sum                 = 0;
                 var multiplicityOfSeven = 0;
@@ -159,7 +159,7 @@ define([
 
             it("should be possible to use its aliases forEach$/eachAll/forEachAll", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var sum                 = 0;
                 var multiplicityOfSeven = 0;
@@ -174,7 +174,7 @@ define([
 
             it("should be able to change the context of the callback function or break prematurely", function() {
 
-                var ms = MultiSet.$create([56, 7, 7, 7, 7, 67, 23]);
+                var ms = MultiSet.create([56, 7, 7, 7, 7, 67, 23]);
 
                 var ctx = {max: 4};
                 var sum = 0;
@@ -196,7 +196,7 @@ define([
 
             it("should output an iterable object containing value & multiplicity", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var setIter = ms.entries();
 
@@ -210,7 +210,7 @@ define([
 
             it("should return the multiplicity of an element", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 expect(ms.get(7)).to.eql(2);
                 expect(ms.multiplicityOf(67)).to.eql(1);
@@ -222,7 +222,7 @@ define([
 
             it("should return all unique elements", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var setIter = ms.keys();
 
@@ -236,7 +236,7 @@ define([
 
             it("should be possible to remove multiple elements", function() {
 
-                var ms = MultiSet.$create().add(7, 67, 23).remove(8, 23).delete(7);
+                var ms = MultiSet.create().add(7, 67, 23).remove(8, 23).delete(7);
 
                 expect(ms.has(7)).to.be.false;
                 expect(ms.has(67)).to.be.true;
@@ -248,7 +248,7 @@ define([
 
             it("should output all elements, including repetitions, as a string if mode is 1", function() {
 
-                var ms = MultiSet.$create().add(7, 7, 7, 67, 23, 8).remove(23);
+                var ms = MultiSet.create().add(7, 7, 7, 67, 23, 8).remove(23);
 
                 expect(ms.toString(1)).to.eql('[7, 7, 7, 67, 8]');
             });
@@ -258,7 +258,7 @@ define([
 
             it("should return all, including repeating, elements", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var setIter = ms.values();
 
@@ -272,7 +272,7 @@ define([
 
             it("should return all, including repeating, elements", function() {
 
-                var ms = MultiSet.$create([7, 7, 67, 23]);
+                var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var keySum          = 0;
                 var multiplicitySum = 0;

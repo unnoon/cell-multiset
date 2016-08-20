@@ -17,20 +17,20 @@ const one  = 1|0;
 
 const properties = {
     /**
-     * @name MultiSet#$info
+     * @name MultiSet.info
      * @type Object
      * @desc
      *       Info object to hold general module information.
      */
-    $info: {
+    'static info': {
         "name"       : "cell-multiset",
         "description": "Fast JS MultiSet implementation.",
         "version"    : "0.0.0",
         "url"        : "https://github.com/unnoon/cell-multiset"
     },
     /**
-     * @method MultiSet#$create
-     * @desc   **aliases:** $spawn
+     * @method MultiSet.create
+     * @desc   **aliases:** spawn
      * #
      *         Easy create method for people who use prototypal inheritance.
      *
@@ -38,8 +38,8 @@ const properties = {
      *
      * @return {MultiSet} new MultiSet
      */
-    $create: function(iterable=void 0) {
-    "@aliases: $spawn";
+    'static create': function(iterable=void 0) {
+    "@aliases: spawn";
     {
         return Object.create(MultiSet.prototype).init(iterable);
     }},
@@ -67,7 +67,7 @@ const properties = {
     },
     /**
      * @name MultiSet#cardinality
-     * @desc   **aliases:** size
+     * @desc **aliases:** size
      * #
      *       Getter for the cardinality of the set.
      *       In case of a set it will return a warning.
@@ -91,14 +91,13 @@ const properties = {
     /**
      * @method MultiSet#clear
      * @desc
-     *         Clears the multiset. Alphabet will be retained though.
-     *         Basically setting all multiplicities to zero.
+     *         Clears the multiset.
      *
      * @returns {MultiSet} this
      */
     clear: function()
     {
-        this.elements.forEach((multiplicity, elm, elms) => {elms.set(elm, zero)});
+        this.elements.clear();
 
         return this
     },
@@ -233,30 +232,17 @@ const properties = {
     {
         const max = elms.length;
 
-        for(let i = zero, elm; i < max; i++)
+        for(let i = zero, elm, multiplicity; i < max; i++)
         {
-            elm = elms[i];
+            elm          = elms[i];
+            multiplicity = this.elements.get(elm);
 
-            this.elements.set(elm, Math.max(zero, this.elements.get(elm) - one));
+            if(multiplicity === 1) {this.elements.delete(elm)}
+            else                   {this.elements.set(elm, Math.max(zero, --multiplicity))}
         }
 
         return this
     }},
-    /**
-     * @method MultiSet#toArray
-     * @desc
-     *         Returns a simple array containing all elements including repeating elements.
-     *
-     * @returns {Array}
-     */
-    toArray: function()
-    {
-        var arr = [];
-
-        this.each$(val => arr.push(val));
-
-        return arr
-    },
     /**
      * @method MultiSet#toString
      * @desc   **aliases:** stringify
@@ -265,12 +251,17 @@ const properties = {
      *
      * @returns {string}
      */
-    toString: function() {
+    toString: function(mode) {
     "@aliases: stringify";
     {
         var out = '';
 
-        out += '['; this.each$(elm => {out += (out !== '[' ? ', ' : '') + elm}); out += ']';
+        switch(mode)
+        {
+            case -1 : break;// TODO formal representation & unit tests
+            case  1 : out += '['; this.each$(elm => {out += (out !== '[' ? ', ' : '') + elm}); out += ']'; break;
+            default : out += '{'; this.each((elm, mul) => {out += (out !== '{' ? ', ' : '') + elm + ' => ' + mul}); out += '}'; break; // TODO use string literals
+        }
 
         return out
     }},
@@ -283,53 +274,60 @@ const properties = {
      */
     values: function()
     {
-        return (function*(data) {yield* data.toArray()})(this)
+        let data = [];
+
+        this.each$(val => data.push(val));
+
+        return (function*(data) {yield* data})(data)
     },
     /**
      * @method MultiSet#[@@iterator]
      * @desc
      *         Prototype Symbol.iterator to make MultiSet iterable.
-     *         Returns a new Iterator object that contains the values for each element, including repetitions, in the MultiSet object in insertion order.
+     *         Returns a new Iterator object that contains the [value, multiplicity] for each element, in the MultiSet object in insertion order.
      *
      * @returns {Iterator.<any>}
      */
     ['@@iterator']: function()
     {
-        return this.values()
-    }
+        return this.elements.entries();
+    },
+    /**
+     * @name MultiSet#[@@toStringTag]
+     * @type string
+     * @desc
+     *       Custom name for typeof.
+     */
+    ['@@toStringTag']: 'MultiSet',
+    /**
+     * @name MultiSet.[@@species]
+     * @type function
+     * @desc
+     *       the species of the MultiSet. Which is just the MultiSet constructor.
+     */
+    ['static @@species']: MultiSet
 };
-
-class MultiSet {
-    /**
-     * @constructor MultiSet
-     * @desc
-     *        Fast JS MultiSet implementation.
-     *        'class' stuff...
-     *
-     * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
-     *
-     * @return {MultiSet} new MultiSet
-     */
-    constructor(iterable=void 0)
-    {
-        this.init(iterable);
-    }
-    /**
-     * @method MultiSet.[@@species]
-     * @desc
-     *         The constructor function that is used to create derived objects.
-     */
-    static get [Symbol.species]() {
-        return constructor;
-    }
+/**
+ * @constructor MultiSet
+ * @desc
+ *        Fast JS MultiSet implementation.
+ *        'class' stuff...
+ *
+ * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
+ *
+ * @return {MultiSet} new MultiSet
+ */
+function MultiSet(iterable=void 0)
+{
+    this.init(iterable);
 }
 
-extend(MultiSet.prototype, properties);
+extend(MultiSet, properties);
 
 /**
  * @func extend
  * @desc
- *       Very simple extend function including alias support.
+ *       Very simple extend function including alias, static support.
  *
  * @param {Object} obj        - object to extend.
  * @param {Object} properties - object with the extend properties.
@@ -341,12 +339,17 @@ function extend(obj, properties)
     for(let prop in properties)
     {   if(!properties.hasOwnProperty(prop)) {continue}
 
-        let dsc     = Object.getOwnPropertyDescriptor(properties, prop);
-        let aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
-        let names   = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
-        let symbol  = prop.match(/@@([\w\$]+)/); symbol = symbol ? symbol[1] : '';
+        let dsc      = Object.getOwnPropertyDescriptor(properties, prop);
+        let attrs    = prop.match(/[\w\$\@]+/g); prop = attrs[attrs.length-1]; attrs.pop();
+        let aliases  = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
+        let names    = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
+        let symbol   = prop.match(/@@(.+)/); symbol = symbol ? symbol[1] : '';
+        let addProp  = function(obj, name) {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}};
 
-        names.forEach(name => {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}});
+        names.forEach(name => {
+            if(~attrs.indexOf('static')) {addProp(obj, name)}
+            addProp(obj.prototype, name);
+        });
     }
 
     return obj
