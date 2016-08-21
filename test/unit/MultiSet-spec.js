@@ -54,6 +54,15 @@ define([
 
                 expect(ms.size).to.eql(0);
             });
+
+            it("should be able to call the static form of create/spawn from the constructor function", function() {
+
+                var ms1 = MultiSet.constructor.create();
+                var ms2 = MultiSet.constructor.spawn();
+
+                expect(ms1.size).to.eql(0);
+                expect(ms2.size).to.eql(0);
+            });
         });
 
         describe("add", function() {
@@ -65,6 +74,16 @@ define([
                 expect(ms.has(7)).to.be.true;
                 expect(ms.has(67)).to.be.true;
                 expect(ms.has(23)).to.be.true;
+            });
+        });
+
+        describe("alphabet/underlyingElements", function() {
+
+            it("should output all he unique elements in an array", function() {
+
+                var ms = MultiSet.create().add(7, 7, 67, 23);
+
+                expect(ms.alphabet()).to.eql([7, 67, 23]);
             });
         });
 
@@ -232,6 +251,14 @@ define([
             });
         });
 
+        describe("info (static/non-static)", function() {
+
+            it("should be possible to read the info object from the constructor as well as from the prototype", function() {
+                expect(MultiSet.constructor.info.name).to.eql('cell-multiset');
+                expect(MultiSet.info.name).to.eql('cell-multiset');
+            });
+        });
+
         describe("remove/delete", function() {
 
             it("should be possible to remove multiple elements", function() {
@@ -246,11 +273,25 @@ define([
 
         describe("toString/stringify", function() {
 
-            it("should output all elements, including repetitions, as a string if mode is 1", function() {
+            it("should, by default, output all elements in {value => multiplicity, ...} pairs (like a map).", function() {
+
+                var ms = MultiSet.create().add(7, 7, 7, 67, 23, 8).remove(23);
+
+                expect(ms.toString()).to.eql('{7 => 3, 67 => 1, 8 => 1}');
+            });
+
+            it("should output all elements, including repetitions, as a string if mode is 1 (array like).", function() {
 
                 var ms = MultiSet.create().add(7, 7, 7, 67, 23, 8).remove(23);
 
                 expect(ms.toString(1)).to.eql('[7, 7, 7, 67, 8]');
+            });
+
+            it("should output a formal representation in case mode is -1.", function() {
+
+                var ms = MultiSet.create().add(7, 7, 7, 67, 23, 8).remove(23);
+
+                expect(ms.toString(-1)).to.eql('({7, 67, 8}, {(7, 3), (67, 1), (8, 1)})');
             });
         });
 
@@ -285,6 +326,27 @@ define([
 
                 expect(keySum).to.eql(97);
                 expect(multiplicitySum).to.eql(4);
+            });
+        });
+
+        describe("[@@species]", function() {
+
+            it("should return the MultiSet constructor if the species is requested (static/non-static)", function() {
+
+                var ms = MultiSet.create([7, 7, 67, 23]);
+
+                expect(ms[Symbol.species]).to.eql(MultiSet.constructor);
+                expect(ms.constructor[Symbol.species]).to.eql(MultiSet.constructor);
+            });
+        });
+
+        describe("[@@toStringTag]", function() {
+
+            it("should return the custom type [object MultiSet] in case typeof is used", function() {
+
+                var ms = MultiSet.create([7, 7, 67, 23]);
+
+                expect(Object.prototype.toString.call(ms)).to.eql('[object MultiSet]');
             });
         });
     });

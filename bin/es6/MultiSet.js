@@ -19,7 +19,7 @@ const properties = {
      * @desc
      *       Info object to hold general module information.
      */
-    'static info': {
+    "static info": {
         "name"       : "cell-multiset",
         "description": "Fast JS MultiSet implementation.",
         "version"    : "0.0.0",
@@ -35,7 +35,7 @@ const properties = {
      *
      * @return {MultiSet} new MultiSet
      */
-    'static create': function(iterable=void 0) {
+    "static create": function(iterable=void 0) {
     "@aliases: spawn";
     {
         return Object.create(MultiSet.prototype).init(iterable);
@@ -62,6 +62,23 @@ const properties = {
 
         return this
     },
+    /**
+     * @method MultiSet#alphabet
+     * @desc   **aliases:** underlyingElements
+     * #
+     *         Returns the alphabet (underlying elements) of the multiset in array form.
+     *
+     * @returns {Array}
+     */
+    alphabet: function() {
+    "@aliases: underlyingElements";
+    {
+        const underlyingElements = [];
+
+        this.forEach(letter => underlyingElements.push(letter));
+
+        return underlyingElements
+    }},
     /**
      * @name MultiSet#cardinality
      * @desc **aliases:** size
@@ -255,9 +272,11 @@ const properties = {
 
         switch(mode)
         {
-            case -1 : break;// TODO formal representation & unit tests
-            case  1 : out += '['; this.each$(elm => {out += (out !== '[' ? ', ' : '') + elm}); out += ']'; break;
-            default : out += '{'; this.each((elm, mul) => {out += (out !== '{' ? ', ' : '') + elm + ' => ' + mul}); out += '}'; break; // TODO use string literals
+            case -1 : out += `({${(this.alphabet()+'').replace(/,/g,`, `)}}, {`;
+                      this.each((elm, mul) => out += `${out[out.length-1] !== `{` ? `, ` : ``}(${elm}, ${mul})`);
+                      out += `})`; break;
+            case  1 : out += `[`; this.each$(elm =>       out += `${out !== `[` ? `, ` : ``}${elm}`);           out += `]`; break;
+            default : out += `{`; this.each((elm, mul) => out += `${out !== `{` ? `, ` : ``}${elm} => ${mul}`); out += `}`; break;
         }
 
         return out
@@ -285,7 +304,7 @@ const properties = {
      *
      * @returns {Iterator.<any>}
      */
-    ['@@iterator']: function()
+    ["@@iterator"]: function()
     {
         return this.elements.entries();
     },
@@ -293,16 +312,16 @@ const properties = {
      * @name MultiSet#[@@toStringTag]
      * @type string
      * @desc
-     *       Custom name for typeof.
+     *       Custom name for Object.prototype.toString.call(multiset) === [object MultiSet]
      */
-    ['@@toStringTag']: 'MultiSet',
+    ["@@toStringTag"]: 'MultiSet',
     /**
      * @name MultiSet.[@@species]
      * @type function
      * @desc
      *       the species of the MultiSet. Which is just the MultiSet constructor.
      */
-    ['static @@species']: MultiSet
+    ["static @@species"]: MultiSet
 };
 /**
  * @constructor MultiSet

@@ -38,7 +38,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @desc
          *       Info object to hold general module information.
          */
-        'static info': {
+        "static info": {
             "name": "cell-multiset",
             "description": "Fast JS MultiSet implementation.",
             "version": "0.0.0",
@@ -54,7 +54,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          *
          * @return {MultiSet} new MultiSet
          */
-        'static create': function staticCreate() {
+        "static create": function staticCreate() {
             "@aliases: spawn";
 
             var iterable = arguments.length <= 0 || arguments[0] === undefined ? void 0 : arguments[0];
@@ -81,6 +81,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
 
             return this;
+        },
+        /**
+         * @method MultiSet#alphabet
+         * @desc   **aliases:** underlyingElements
+         * #
+         *         Returns the alphabet (underlying elements) of the multiset in array form.
+         *
+         * @returns {Array}
+         */
+        alphabet: function alphabet() {
+            "@aliases: underlyingElements";
+
+            var _this = this;
+
+            {
+                var _ret = function () {
+                    var underlyingElements = [];
+
+                    _this.forEach(function (letter) {
+                        return underlyingElements.push(letter);
+                    });
+
+                    return {
+                        v: underlyingElements
+                    };
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            }
         },
         /**
          * @name MultiSet#cardinality
@@ -366,15 +395,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 switch (mode) {
                     case -1:
-                        break; // TODO formal representation & unit tests
+                        out += '({' + (this.alphabet() + '').replace(/,/g, ', ') + '}, {';
+                        this.each(function (elm, mul) {
+                            return out += (out[out.length - 1] !== '{' ? ', ' : '') + '(' + elm + ', ' + mul + ')';
+                        });
+                        out += '})';break;
                     case 1:
                         out += '[';this.each$(function (elm) {
-                            out += (out !== '[' ? ', ' : '') + elm;
+                            return out += '' + (out !== '[' ? ', ' : '') + elm;
                         });out += ']';break;
                     default:
                         out += '{';this.each(function (elm, mul) {
-                            out += (out !== '{' ? ', ' : '') + elm + ' => ' + mul;
-                        });out += '}';break; // TODO use string literals
+                            return out += '' + (out !== '{' ? ', ' : '') + elm + ' => ' + mul;
+                        });out += '}';break;
                 }
 
                 return out;
@@ -409,9 +442,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }, _callee, this);
             })(data);
         }
-    }, _defineProperty(_properties, '@@iterator', function iterator() {
+    }, _defineProperty(_properties, "@@iterator", function iterator() {
         return this.elements.entries();
-    }), _defineProperty(_properties, '@@toStringTag', 'MultiSet'), _defineProperty(_properties, 'static @@species', MultiSet), _properties);
+    }), _defineProperty(_properties, "@@toStringTag", 'MultiSet'), _defineProperty(_properties, "static @@species", MultiSet), _properties);
     /**
      * @constructor MultiSet
      * @desc
@@ -469,9 +502,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         };
 
         for (var prop in properties) {
-            var _ret = _loop(prop);
+            var _ret2 = _loop(prop);
 
-            if (_ret === 'continue') continue;
+            if (_ret2 === 'continue') continue;
         }
 
         return obj;
