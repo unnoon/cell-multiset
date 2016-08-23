@@ -77,16 +77,6 @@ define([
             });
         });
 
-        describe("alphabet/underlyingElements", function() {
-
-            it("should output all he unique elements in an array", function() {
-
-                var ms = MultiSet.create().add(7, 7, 67, 23);
-
-                expect(ms.alphabet()).to.eql([7, 67, 23]);
-            });
-        });
-
         describe("cardinality/size", function() {
 
             it("should return the cardinality of the set", function() {
@@ -237,13 +227,24 @@ define([
             });
         });
 
-        describe("keys", function() {
+        describe("keys/underlyingElements", function() {
 
             it("should return all unique elements", function() {
 
                 var ms = MultiSet.create([7, 7, 67, 23]);
 
                 var setIter = ms.keys();
+
+                expect(setIter.next().value).to.eql(7);
+                expect(setIter.next().value).to.eql(67);
+                expect(setIter.next().value).to.eql(23);
+            });
+
+            it("should be possible to use the alias 'underlyingElements'", function() {
+
+                var ms = MultiSet.create([7, 7, 67, 23]);
+
+                var setIter = ms.underlyingElements();
 
                 expect(setIter.next().value).to.eql(7);
                 expect(setIter.next().value).to.eql(67);

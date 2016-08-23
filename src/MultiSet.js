@@ -67,23 +67,6 @@ const properties = {
         return this
     },
     /**
-     * @method MultiSet#alphabet
-     * @desc   **aliases:** underlyingElements
-     * #
-     *         Returns the alphabet (underlying elements) of the multiset in array form.
-     *
-     * @returns {Array}
-     */
-    alphabet: function() {
-    "@aliases: underlyingElements";
-    {
-        const underlyingElements = [];
-
-        this.forEach(letter => underlyingElements.push(letter));
-
-        return underlyingElements
-    }},
-    /**
      * @name MultiSet#cardinality
      * @desc **aliases:** size
      * #
@@ -226,12 +209,14 @@ const properties = {
     }},
     /**
      * @method MultiSet#keys
-     * @desc
+     * @desc   **aliases:** underlyingElements
+     * #
      *         Returns a new Iterator object that contains the unique elements in the Set object in insertion order.
      *
      * @returns {Iterator.<any>}
      */
     keys: function() {
+    "@aliases: underlyingElements";
     {
         return this.elements.keys();
     }},
@@ -276,7 +261,7 @@ const properties = {
 
         switch(mode)
         {
-            case -1 : out += `({${(this.alphabet()+'').replace(/,/g,`, `)}}, {`;
+            case -1 : out += `({${(Array.from(this.keys())+'').replace(/,/g,`, `)}}, {`;
                       this.each((elm, mul) => out += `${out[out.length-1] !== `{` ? `, ` : ``}(${elm}, ${mul})`);
                       out += `})`; break;
             case  1 : out += `[`; this.each$(elm =>       out += `${out !== `[` ? `, ` : ``}${elm}`);           out += `]`; break;
