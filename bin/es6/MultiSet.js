@@ -157,8 +157,8 @@ const properties = {
      */
     Difference: function(multiset)
     {
-        var output = MultiSet.create();
-        let nmul;
+        const output = MultiSet.create();
+        let   nmul;
 
         multiset.elements.forEach((multiplicity, elm) => {
             nmul = this.multiplicity(elm) - multiplicity;
@@ -206,10 +206,11 @@ const properties = {
     each$: function(cb, ctx=null) {
     "@aliases: forEach$, eachAll, forEachAll";
     {
-        let count = 0;
+        let a, i, mul, count = 0;
+
         // for(let [elm, multiplicity] of this.elements) // destructuring is nice but slow...
-        for(let a of this.elements)
-        {   for(let i = 0, mul = a[1]/*multiplicity*/; i < mul; i++, count++)
+        for(a of this.elements)
+        {   for(i = 0, mul = a[1]/*multiplicity*/; i < mul; i++, count++)
             {
                 if(cb.call(ctx, a[0]/*elm*/, count, this) === false) {return false}
             }
@@ -227,6 +228,22 @@ const properties = {
     entries: function()
     {
         return this.elements.entries();
+    },
+    /**
+     * @method MultiSet#equals
+     * @desc
+     *         Checks equality between 2 multisets.
+     *
+     * @param {MultiSet} multiset - Multiset to check equality with.
+     *
+     * @returns {boolean} Boolean indicating if the 2 multisets are equal.
+     */
+    equals: function(multiset)
+    {   if(this.size !== multiset.size) {return false}
+
+        return multiset.each((mul, elm) => {
+            return mul !== this.multiplicity(elm)
+        });
     },
     /**
      * @method MultiSet#has
@@ -297,8 +314,8 @@ const properties = {
     Intersection: function(multiset) {
     "@aliases: And";
     {
-        let output = MultiSet.create();
-        let nmul;
+        const output = MultiSet.create();
+        let   nmul;
 
         this.elements.forEach((multiplicity, elm) => {
             nmul = Math.min(multiplicity, multiset.multiplicity(elm));
@@ -412,8 +429,8 @@ const properties = {
     SymmetricDifference: function(multiset) {
     "@aliases: Exclusion";
     {
-        let output = this.clone();
-        let diff;
+        const output = this.clone();
+        let   diff;
 
         multiset.elements.forEach((multiplicity, elm) => {
             diff = output.multiplicity(elm) - multiplicity;
@@ -440,11 +457,11 @@ const properties = {
     toString: function(mode) {
     "@aliases: stringify";
     {
-        var out = '';
+        let out = '';
 
         switch(mode)
         {
-            case -1 : out += `({${(Array.from(this.keys())+'').replace(/,/g,`, `)}}, {`;
+            case -1 : out += `({${`${Array.from(this.keys())}`.replace(/,/g,`, `)}}, {`;
                       this.each((elm, mul) => out += `${out[out.length-1] !== `{` ? `, ` : ``}(${elm}, ${mul})`);
                       out += `})`; break;
             case  1 : out += `[`; this.each$(elm =>       out += `${out !== `[` ? `, ` : ``}${elm}`);           out += `]`; break;
@@ -483,7 +500,7 @@ const properties = {
     Union: function(multiset) {
     "@aliases: Or";
     {
-        let output = this.clone();
+        const output = this.clone();
 
         multiset.elements.forEach((multiplicity, elm) => output.elements.set(elm, Math.max(multiplicity, output.multiplicity(elm))));
 
@@ -498,7 +515,7 @@ const properties = {
      */
     values: function()
     {
-        let data = [];
+        const data = [];
 
         this.each$(val => data.push(val));
 
@@ -517,19 +534,19 @@ const properties = {
         return this.elements.entries();
     },
     /**
-     * @name MultiSet#[@@toStringTag]
-     * @type string
-     * @desc
-     *       Custom name for Object.prototype.toString.call(multiset) === [object MultiSet]
-     */
-    ["@@toStringTag"]: 'MultiSet',
-    /**
      * @name MultiSet.[@@species]
      * @type function
      * @desc
      *       the species of the MultiSet. Which is just the MultiSet constructor.
      */
-    ["static @@species"]: MultiSet
+    ["static @@species"]: MultiSet,
+    /**
+     * @name MultiSet#[@@toStringTag]
+     * @type string
+     * @desc
+     *       Custom name for Object.prototype.toString.call(multiset) === [object MultiSet]
+     */
+    ["@@toStringTag"]: 'MultiSet'
 };
 /**
  * @constructor MultiSet
@@ -560,12 +577,10 @@ extend(MultiSet, properties);
  */
 function extend(obj, properties)
 {
-    for(let prop in properties)
-    {   if(!properties.hasOwnProperty(prop)) {continue}
-
+    Object.keys(properties).forEach(prop => {
         let dsc      = Object.getOwnPropertyDescriptor(properties, prop);
-        let attrs    = prop.match(/[\w\$\@]+/g); prop = attrs[attrs.length-1]; attrs.pop();
-        let aliases  = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
+        let attrs    = prop.match(/[\w\$\@]+/g); prop = attrs.pop();
+        let aliases  = `${dsc.value || dsc.get || dsc.set}`.match(/@aliases:(.*?);/);
         let names    = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
         let symbol   = prop.match(/@@(.+)/); symbol = symbol ? symbol[1] : '';
         let addProp  = function(obj, name) {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}};
@@ -574,7 +589,7 @@ function extend(obj, properties)
             if(~attrs.indexOf('static')) {addProp(obj, name)}
             addProp(obj.prototype, name);
         });
-    }
+    });
 
     return obj
 }

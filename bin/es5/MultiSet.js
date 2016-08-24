@@ -282,7 +282,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             var ctx = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
             {
-                var count = 0;
+                var a = void 0,
+                    i = void 0,
+                    mul = void 0,
+                    count = 0;
+
                 // for(let [elm, multiplicity] of this.elements) // destructuring is nice but slow...
                 var _iteratorNormalCompletion3 = true;
                 var _didIteratorError3 = false;
@@ -290,8 +294,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 try {
                     for (var _iterator3 = this.elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var a = _step3.value;
-                        for (var i = 0, mul = a[1] /*multiplicity*/; i < mul; i++, count++) {
+                        a = _step3.value;
+                        for (i = 0, mul = a[1] /*multiplicity*/; i < mul; i++, count++) {
                             if (cb.call(ctx, a[0] /*elm*/, count, this) === false) {
                                 return false;
                             }
@@ -324,6 +328,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          */
         entries: function entries() {
             return this.elements.entries();
+        },
+        /**
+         * @method MultiSet#equals
+         * @desc
+         *         Checks equality between 2 multisets.
+         *
+         * @param {MultiSet} multiset - Multiset to check equality with.
+         *
+         * @returns {boolean} Boolean indicating if the 2 multisets are equal.
+         */
+        equals: function equals(multiset) {
+            var _this3 = this;
+
+            if (this.size !== multiset.size) {
+                return false;
+            }
+
+            return multiset.each(function (mul, elm) {
+                return mul !== _this3.multiplicity(elm);
+            });
         },
         /**
          * @method MultiSet#has
@@ -397,24 +421,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         intersection: function intersection(multiset) {
             "@aliases: and";
 
-            var _this3 = this;
+            var _this4 = this;
 
             {
                 var _ret = function () {
                     var nmul = void 0;
 
-                    _this3.elements.forEach(function (multiplicity, elm) {
+                    _this4.elements.forEach(function (multiplicity, elm) {
                         nmul = Math.min(multiplicity, multiset.multiplicity(elm));
 
                         if (!nmul) {
-                            _this3.elements.delete(elm);
+                            _this4.elements.delete(elm);
                         } else {
-                            _this3.elements.set(elm, nmul);
+                            _this4.elements.set(elm, nmul);
                         }
                     });
 
                     return {
-                        v: _this3
+                        v: _this4
                     };
                 }();
 
@@ -434,14 +458,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         Intersection: function Intersection(multiset) {
             "@aliases: And";
 
-            var _this4 = this;
+            var _this5 = this;
 
             {
                 var _ret2 = function () {
                     var output = MultiSet.create();
                     var nmul = void 0;
 
-                    _this4.elements.forEach(function (multiplicity, elm) {
+                    _this5.elements.forEach(function (multiplicity, elm) {
                         nmul = Math.min(multiplicity, multiset.multiplicity(elm));
 
                         if (nmul) {
@@ -544,24 +568,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         symmetricDifference: function symmetricDifference(multiset) {
             "@aliases: exclusion";
 
-            var _this5 = this;
+            var _this6 = this;
 
             {
                 var _ret3 = function () {
                     var diff = void 0;
 
                     multiset.elements.forEach(function (multiplicity, elm) {
-                        diff = _this5.multiplicity(elm) - multiplicity;
+                        diff = _this6.multiplicity(elm) - multiplicity;
 
                         if (!diff) {
-                            _this5.elements.delete(elm);
+                            _this6.elements.delete(elm);
                         } else {
-                            _this5.elements.set(elm, Math.abs(diff));
+                            _this6.elements.set(elm, Math.abs(diff));
                         }
                     });
 
                     return {
-                        v: _this5
+                        v: _this6
                     };
                 }();
 
@@ -581,11 +605,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         SymmetricDifference: function SymmetricDifference(multiset) {
             "@aliases: Exclusion";
 
-            var _this6 = this;
+            var _this7 = this;
 
             {
                 var _ret4 = function () {
-                    var output = _this6.clone();
+                    var output = _this7.clone();
                     var diff = void 0;
 
                     multiset.elements.forEach(function (multiplicity, elm) {
@@ -622,27 +646,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         toString: function toString(mode) {
             "@aliases: stringify";
 
+            var _this8 = this;
+
             {
-                var out = '';
+                var _ret5 = function () {
+                    var out = '';
 
-                switch (mode) {
-                    case -1:
-                        out += '({' + (Array.from(this.keys()) + '').replace(/,/g, ', ') + '}, {';
-                        this.each(function (elm, mul) {
-                            return out += (out[out.length - 1] !== '{' ? ', ' : '') + '(' + elm + ', ' + mul + ')';
-                        });
-                        out += '})';break;
-                    case 1:
-                        out += '[';this.each$(function (elm) {
-                            return out += '' + (out !== '[' ? ', ' : '') + elm;
-                        });out += ']';break;
-                    default:
-                        out += '{';this.each(function (elm, mul) {
-                            return out += '' + (out !== '{' ? ', ' : '') + elm + ' => ' + mul;
-                        });out += '}';break;
-                }
+                    switch (mode) {
+                        case -1:
+                            out += '({' + ('' + Array.from(_this8.keys())).replace(/,/g, ', ') + '}, {';
+                            _this8.each(function (elm, mul) {
+                                return out += (out[out.length - 1] !== '{' ? ', ' : '') + '(' + elm + ', ' + mul + ')';
+                            });
+                            out += '})';break;
+                        case 1:
+                            out += '[';_this8.each$(function (elm) {
+                                return out += '' + (out !== '[' ? ', ' : '') + elm;
+                            });out += ']';break;
+                        default:
+                            out += '{';_this8.each(function (elm, mul) {
+                                return out += '' + (out !== '{' ? ', ' : '') + elm + ' => ' + mul;
+                            });out += '}';break;
+                    }
 
-                return out;
+                    return {
+                        v: out
+                    };
+                }();
+
+                if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
             }
         },
         /**
@@ -658,11 +690,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         union: function union(multiset) {
             "@aliases: or";
 
-            var _this7 = this;
+            var _this9 = this;
 
             {
                 multiset.elements.forEach(function (multiplicity, elm) {
-                    return _this7.elements.set(elm, Math.max(multiplicity, _this7.multiplicity(elm)));
+                    return _this9.elements.set(elm, Math.max(multiplicity, _this9.multiplicity(elm)));
                 });
 
                 return this;
@@ -681,11 +713,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         Union: function Union(multiset) {
             "@aliases: Or";
 
-            var _this8 = this;
+            var _this10 = this;
 
             {
-                var _ret5 = function () {
-                    var output = _this8.clone();
+                var _ret6 = function () {
+                    var output = _this10.clone();
 
                     multiset.elements.forEach(function (multiplicity, elm) {
                         return output.elements.set(elm, Math.max(multiplicity, output.multiplicity(elm)));
@@ -696,7 +728,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     };
                 }();
 
-                if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
+                if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
             }
         },
         /**
@@ -730,7 +762,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     }, _defineProperty(_properties, "@@iterator", function iterator() {
         return this.elements.entries();
-    }), _defineProperty(_properties, "@@toStringTag", 'MultiSet'), _defineProperty(_properties, "static @@species", MultiSet), _properties);
+    }), _defineProperty(_properties, "static @@species", MultiSet), _defineProperty(_properties, "@@toStringTag", 'MultiSet'), _properties);
     /**
      * @constructor MultiSet
      * @desc
@@ -760,16 +792,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * @returns {Object} the object after extension.
      */
     function extend(obj, properties) {
-        var _loop = function _loop(_prop) {
-            if (!properties.hasOwnProperty(_prop)) {
-                return 'continue';
-            }
-
-            var dsc = Object.getOwnPropertyDescriptor(properties, _prop);
-            var attrs = _prop.match(/[\w\$\@]+/g);_prop = attrs[attrs.length - 1];attrs.pop();
-            var aliases = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
-            var names = aliases ? aliases[1].match(/[\w\$]+/g) : [];names.unshift(_prop);
-            var symbol = _prop.match(/@@(.+)/);symbol = symbol ? symbol[1] : '';
+        Object.keys(properties).forEach(function (prop) {
+            var dsc = Object.getOwnPropertyDescriptor(properties, prop);
+            var attrs = prop.match(/[\w\$\@]+/g);prop = attrs.pop();
+            var aliases = ('' + (dsc.value || dsc.get || dsc.set)).match(/@aliases:(.*?);/);
+            var names = aliases ? aliases[1].match(/[\w\$]+/g) : [];names.unshift(prop);
+            var symbol = prop.match(/@@(.+)/);symbol = symbol ? symbol[1] : '';
             var addProp = function addProp(obj, name) {
                 if (symbol) {
                     obj[Symbol[symbol]] = dsc.value;
@@ -784,14 +812,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
                 addProp(obj.prototype, name);
             });
-            prop = _prop;
-        };
-
-        for (var prop in properties) {
-            var _ret6 = _loop(prop);
-
-            if (_ret6 === 'continue') continue;
-        }
+        });
 
         return obj;
     }
