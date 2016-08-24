@@ -38,7 +38,7 @@ var obj = {iam: 'object'};
 
 var ms1 = MultiSet.create([7, 67, 7, 7, 'text', obj, 'text', obj]); // use an iterable for initialization.
 var ms2 = Object.create(MultiSet).init([7, 67, 7, 'text', obj, 'text2', obj, 99]);
-var ms3 = new MultiSet.constructor([7, 67, 7, 7, 'text', obj, 'text', obj]); // or use the constructor function. Preferably you would like to use the CMultiSet export for this.
+var ms3 = new MultiSet.constructor([7, 67, 7, 7, 'text', obj, 'text', obj]); // or use the constructor function. Preferably you'd want to use the CMultiSet export for this.
 
 expect(ms1.size).to.eql(8); // cardinality (@alias) of the multiset.
 expect(ms1.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2}');
@@ -60,7 +60,7 @@ expect(ms4.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2
 
 For more usage example see the unit tests @ /test/unit/MultiSet-spec.js
 
-## Prototypal(OLOO) vs JS inheritance
+## Prototypal(OLOO) vs 'Classical' inheritance
 
 By default prototypal(OLOO) inheritance is supported. Practically this means that the default export will be the MultiSet prototype. Also all static properties will be directly available on the prototype (as well as on the constructor function). If you prefer 'classical' inheritance a CMultiSet export is also provided.
 
