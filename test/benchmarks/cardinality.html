@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Benchbank test some shit</title>
+    <script src="../../src/MultiSet.js"></script>
+    <script src="../../bower_components/lodash/lodash.js"></script>
+    <script src="../../bower_components/benchmark/benchmark.js"></script>
+    <script>
+        // int32 consts
+        const zero = 0|0;
+        const one  = 1|0;
+
+        Reflect.defineProperty(MultiSet, 'cardinality2', {get: function() {
+            let len = zero;
+
+            for(let [elm, multiplicity] of this.elements)
+            {
+                len += multiplicity
+            }
+
+            return len
+        }});
+
+        Reflect.defineProperty(MultiSet, 'cardinality3', {get: function() {
+            return Array.from(this.elements.values()).reduce( (prev, curr) => prev + curr );
+        }});
+
+        Reflect.defineProperty(MultiSet, 'cardinality4', {get: function() {
+            let len = zero;
+            let arr = Array.from(this.elements.values());
+
+            for(let i = zero, max = arr.length; i < max; i++)
+            {
+                len += arr[i];
+            }
+
+            return len
+        }});
+
+        Reflect.defineProperty(MultiSet, 'cardinality5', {get: function() {
+            let len = zero;
+
+            for(let a of this.elements)
+            {
+                len += a[1];
+            }
+
+            return len
+        }});
+
+        var ms = MultiSet.create([7, 7, 67, 7, 23, 67, 67, 8]);
+
+        console.log(ms.cardinality);
+        console.log(ms.cardinality2);
+        console.log(ms.cardinality3);
+        console.log(ms.cardinality4);
+        console.log(ms.cardinality5);
+
+        var result = '';
+        var suite = new Benchmark.Suite;
+
+        // add tests
+        suite
+            .add('c1', function() {
+                ms.cardinality;
+            })
+            .add('c2', function() {
+                ms.cardinality2;
+            })
+            .add('c3', function() {
+                ms.cardinality3;
+            })
+            .add('c4', function() {
+                ms.cardinality4;
+            })
+            .add('c5', function() {
+                ms.cardinality5;
+            })
+            // add listeners
+            .on('cycle', function(event) {
+                var out = String(event.target);
+                result += out+'\n';
+                console.log(out);
+            })
+            .on('complete', function() {
+                var out = 'Fastest is ' + this.filter('fastest').map('name');
+                console.log(out);
+                alert(out + '\n' + result);
+            })
+            // run async
+            .run({ 'async': true });
+    </script>
+</head>
+<body>
+</body>
+</html>

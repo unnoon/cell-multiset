@@ -114,6 +114,31 @@ define([
             });
         });
 
+        describe("contains", function() {
+
+            it("should check containment", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 1, 2]);
+
+                expect(ms1.contains(ms2)).to.be.false;
+                expect(ms2.contains(ms1)).to.be.true;
+            });
+        });        
+
+        describe("difference", function() {
+
+            it("should calculate the difference between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                ms1.difference(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1]');
+            });
+        });
+
         describe("each/forEach", function() {
 
             it("should iterate over the alphabet of the set", function() {
@@ -215,15 +240,48 @@ define([
             });
         });
 
-        describe("get/multiplicityOf", function() {
+        describe("info (static/non-static)", function() {
 
-            it("should return the multiplicity of an element", function() {
+            it("should be possible to read the info object from the constructor as well as from the prototype", function() {
+                expect(MultiSet.constructor.info.name).to.eql('cell-multiset');
+                expect(MultiSet.info.name).to.eql('cell-multiset');
+            });
+        });
 
-                var ms = MultiSet.create([7, 7, 67, 23]);
+        describe("intersection/and", function() {
 
-                expect(ms.get(7)).to.eql(2);
-                expect(ms.multiplicityOf(67)).to.eql(1);
-                expect(ms.get('ndef')).to.eql(undefined);
+            it("should calculate the intersection between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1, 1, 3]);
+                var ms2 = MultiSet.create([1, 1]);
+
+                ms1.intersection(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+
+            it("should be able to use the alias and", function() {
+
+                var ms1 = MultiSet.create([1, 1, 1, 3]);
+                var ms2 = MultiSet.create([1, 1]);
+
+                ms1.and(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+        });
+
+        describe("isSubsetOf/isContainedIn", function() {
+
+            it("should check if it is a subset of another", function() {
+
+                var ms1 = MultiSet.create([1, 1, 2]);
+                var ms2 = MultiSet.create([1, 1, 2, 2, 3]);
+
+                expect(ms1.isSubsetOf(ms2)).to.be.true;
+                expect(ms2.isSubsetOf(ms1)).to.be.false;
+                expect(ms1.isContainedIn(ms2)).to.be.true;
+                expect(ms2.isContainedIn(ms1)).to.be.false;
             });
         });
 
@@ -252,11 +310,15 @@ define([
             });
         });
 
-        describe("info (static/non-static)", function() {
+        describe("multiplicity", function() {
 
-            it("should be possible to read the info object from the constructor as well as from the prototype", function() {
-                expect(MultiSet.constructor.info.name).to.eql('cell-multiset');
-                expect(MultiSet.info.name).to.eql('cell-multiset');
+            it("should return the multiplicity of an element", function() {
+
+                var ms = MultiSet.create([7, 7, 67, 23]);
+
+                expect(ms.multiplicity(7)).to.eql(2);
+                expect(ms.multiplicity(67)).to.eql(1);
+                expect(ms.multiplicity('ndef')).to.eql(0);
             });
         });
 
@@ -296,6 +358,29 @@ define([
             });
         });
 
+        describe("union/or", function() {
+
+            it("should calculate the union between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                ms1.union(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1, 1, 2]');
+            });
+
+            it("should be able to use the alias or", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                ms1.or(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1, 1, 2]');
+            });
+        });        
+        
         describe("values", function() {
 
             it("should return all, including repeating, elements", function() {
