@@ -1,6 +1,6 @@
 {
   "name": "cell-multiset",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fast JS MultiSet implementation.",
   "main": "src/MultiSet.js",
   "scripts": {
