@@ -7,12 +7,28 @@ define([
         describe("basic usage", function() {
 
             it("should demonstrate the basic functions of cell-multiset", function() {
+                var obj = {iam: 'object'};
 
-                var ms = MultiSet.spawn([7, 67, 23]);
+                var ms1 = MultiSet.create([7, 67, 7, 7, 'text', obj, 'text', obj]); // use an iterable for initialization.
+                var ms2 = Object.create(MultiSet).init([7, 67, 7, 'text', obj, 'text2', obj, 99]);
+                var ms3 = new MultiSet.constructor([7, 67, 7, 7, 'text', obj, 'text', obj]); // or use the constructor function. Preferably you would like to use the CMultiSet export for this.
 
-                expect(ms.has(7)).to.be.true;
-                expect(ms.has(67)).to.be.true;
-                expect(ms.has(23)).to.be.true;
+                expect(ms1.size).to.eql(8); // cardinality (@alias) of the multiset.
+                expect(ms1.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2}');
+                expect(ms1.has(7)).to.be.true;
+                expect(ms1.multiplicity(obj)).to.eql(2);
+                expect(ms1.multiplicity(undefined)).to.eql(0); // non existent elements have multiplicity 0.
+                expect(ms1.equals(ms3)).to.be.true; // checks equality between 2 multisets.
+
+                ms1.union(ms2);
+
+                expect(ms1.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2, text2 => 1, 99 => 1}');
+                expect(ms1.size).to.eql(10);
+
+                var ms4 = ms3.Union(ms2); // use Pascal case Union to output a new MultiSet and leave ms3 unchanged.
+
+                expect(ms3.toString(1)).to.eql('[7, 7, 7, 67, text, text, [object Object], [object Object]]'); // use mode=1 to output single dimension array-like string.
+                expect(ms4.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2, text2 => 1, 99 => 1}');
             });
         });
 
@@ -251,6 +267,21 @@ define([
             });
         });
 
+        describe("equals", function() {
+
+            it("should check equality between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([7, 7, 67, 23]);
+                var ms2 = MultiSet.create([7, 7, 67, 23]);
+                var ms3 = MultiSet.create([7, 7, 7, 67, 23]);
+
+                expect(ms1 == ms2).to.be.false;
+                expect(ms1 === ms2).to.be.false;
+                expect(ms1.equals(ms2)).to.be.true;
+                expect(ms1.equals(ms3)).to.be.false;
+            });
+        });
+
         describe("entries", function() {
 
             it("should output an iterable object containing value & multiplicity", function() {
@@ -388,8 +419,8 @@ define([
 
             it("should calculate the symmetricDifference between 2 multisets", function() {
 
-                var ms1 = MultiSet.create([1, 1]);
-                var ms2 = MultiSet.create([1, 2]);
+                var ms1 = MultiSet.create([1, 1, 3, 3]);
+                var ms2 = MultiSet.create([1, 2, 3, 3]);
 
                 ms1.symmetricDifference(ms2);
 
@@ -411,13 +442,13 @@ define([
 
             it("should calculate the SymmetricDifference between 2 multisets", function() {
 
-                var ms1 = MultiSet.create([1, 1]);
-                var ms2 = MultiSet.create([1, 2]);
+                var ms1 = MultiSet.create([1, 1, 3, 3]);
+                var ms2 = MultiSet.create([1, 2, 3, 3]);
 
                 var sd = ms1.SymmetricDifference(ms2);
 
                 expect(sd.toString(1)).to.eql('[1, 2]');
-                expect(ms1.toString(1)).to.eql('[1, 1]');
+                expect(ms1.toString(1)).to.eql('[1, 1, 3, 3]');
             });
 
             it("should be possible to use the alias Exclusion", function() {

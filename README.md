@@ -12,7 +12,6 @@ Fast & consistent JavaScript MultiSet (AKA bag, bunch) implementation. Implement
 - Fast! 
 - Fully tested
 - Fully documented
-- Both bitset & bitvector like operands
 - Pascal case operands can be used to output new multisets
 - Chaining
 - Lots of aliases
@@ -35,10 +34,35 @@ Fast & consistent JavaScript MultiSet (AKA bag, bunch) implementation. Implement
 ## Usage
 
 ```js
-/* Coming soon.... */
+var obj = {iam: 'object'};
+
+var ms1 = MultiSet.create([7, 67, 7, 7, 'text', obj, 'text', obj]); // use an iterable for initialization.
+var ms2 = Object.create(MultiSet).init([7, 67, 7, 'text', obj, 'text2', obj, 99]);
+var ms3 = new MultiSet.constructor([7, 67, 7, 7, 'text', obj, 'text', obj]); // or use the constructor function. Preferably you would like to use the CMultiSet export for this.
+
+expect(ms1.size).to.eql(8); // cardinality (@alias) of the multiset.
+expect(ms1.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2}');
+expect(ms1.has(7)).to.be.true;
+expect(ms1.multiplicity(obj)).to.eql(2);
+expect(ms1.multiplicity(undefined)).to.eql(0); // non existent elements have multiplicity 0.
+expect(ms1.equals(ms3)).to.be.true; // checks equality between 2 multisets.
+
+ms1.union(ms2);
+
+expect(ms1.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2, text2 => 1, 99 => 1}');
+expect(ms1.size).to.eql(10);
+
+var ms4 = ms3.Union(ms2); // use Pascal case Union to output a new MultiSet and leave ms3 unchanged.
+
+expect(ms3.toString(1)).to.eql('[7, 7, 7, 67, text, text, [object Object], [object Object]]'); // use mode=1 to output single dimension array-like string.
+expect(ms4.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2, text2 => 1, 99 => 1}');
 ```
 
 For more usage example see the unit tests @ /test/unit/MultiSet-spec.js
+
+## Prototypal(OLOO) vs JS inheritance
+
+By default prototypal(OLOO) inheritance is supported. Practically this means that the default export will be the MultiSet prototype. Also all static properties will be directly available on the prototype (as well as on the constructor function). If you prefer 'classical' inheritance a CMultiSet export is also provided.
 
 ## Documentation
 
