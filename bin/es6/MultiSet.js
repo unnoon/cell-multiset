@@ -63,23 +63,6 @@ const properties = {
         return this
     },
     /**
-     * @method MultiSet#alphabet
-     * @desc   **aliases:** underlyingElements
-     * #
-     *         Returns the alphabet (underlying elements) of the multiset in array form.
-     *
-     * @returns {Array}
-     */
-    alphabet: function() {
-    "@aliases: underlyingElements";
-    {
-        const underlyingElements = [];
-
-        this.forEach(letter => underlyingElements.push(letter));
-
-        return underlyingElements
-    }},
-    /**
      * @name MultiSet#cardinality
      * @desc **aliases:** size
      * #
@@ -94,7 +77,7 @@ const properties = {
     {
         let len = zero;
 
-        this.elements.forEach(multiplicity => len += multiplicity); // TODO improve speed
+        this.elements.forEach(multiplicity => len += multiplicity);
 
         return len
     }},
@@ -116,6 +99,76 @@ const properties = {
         return this
     },
     /**
+     * @method MultiSet#clone
+     * @desc
+     *         Creates a clone of the multiset.
+     *
+     * @returns {MultiSet} clone
+     */
+    clone: function()
+    {
+        return MultiSet.create(this.values());
+    },
+    /**
+     * @method MultiSet#contains
+     * @desc
+     *         Checks if a multiset contains another.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {boolean} Boolean indicating if the multiset is contained in the current one.
+     */
+    contains: function(multiset)
+    {
+        for(let a of multiset.elements) {if(a[1]/*multiplicity*/ > this.multiplicity(a[0]/*elm*/)) {return false}}
+
+        return true
+    },
+    /**
+     * @method MultiSet#difference
+     * @desc
+     *         Calculates the difference between 2 multisets.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} this
+     */
+    difference: function(multiset)
+    {
+        let nmul;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            nmul = this.multiplicity(elm) - multiplicity;
+
+            if(nmul <= 0) {this.elements.delete(elm)}
+            else          {this.elements.set(elm, nmul)}
+        });
+
+        return this
+    },
+    /**
+     * @method MultiSet#Difference
+     * @desc
+     *         Calculates the difference between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} new MultiSet containing the difference
+     */
+    Difference: function(multiset)
+    {
+        var output = MultiSet.create();
+        let nmul;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            nmul = this.multiplicity(elm) - multiplicity;
+
+            if(nmul > 0) {output.elements.set(elm, nmul)}
+        });
+
+        return output
+    },
+    /**
      * @method MultiSet#each
      * @desc   **aliases:** forEach
      * #
@@ -130,15 +183,16 @@ const properties = {
     each: function(cb, ctx=null) {
     "@aliases: forEach";
     {
-        for(let [elm, multiplicity] of this.elements)
+        // for(let [elm, multiplicity] of this.elements) // destructuring is nice but slow...
+        for(let a of this.elements)
         {
-            if(cb.call(ctx, elm, multiplicity, this) === false) {return false}
+            if(cb.call(ctx, a[0]/*elm*/, a[1]/*multiplicity*/, this) === false) {return false}
         }
 
         return true
     }},
     /**
-     * @method MultiSet#each
+     * @method MultiSet#each$
      * @desc   **aliases:** forEach$, eachAll, forEachAll
      * #
      *         Iterates over the all elements of the set. Repeating elements if the multiplicity is higher then 1.
@@ -153,10 +207,11 @@ const properties = {
     "@aliases: forEach$, eachAll, forEachAll";
     {
         let count = 0;
-        for(let [elm, multiplicity] of this.elements)
-        {   for(let i = 0; i < multiplicity; i++, count++)
+        // for(let [elm, multiplicity] of this.elements) // destructuring is nice but slow...
+        for(let a of this.elements)
+        {   for(let i = 0, mul = a[1]/*multiplicity*/; i < mul; i++, count++)
             {
-                if(cb.call(ctx, elm, count, this) === false) {return false}
+                if(cb.call(ctx, a[0]/*elm*/, count, this) === false) {return false}
             }
         }
 
@@ -174,19 +229,19 @@ const properties = {
         return this.elements.entries();
     },
     /**
-     * @method MultiSet#get
-     * @desc   **aliases:** multiplicityOf
+     * @method MultiSet#has
+     * @desc   **aliases:** isMember
      * #
-     *         Map style getter to return the multiplicity of an element. undefined if the element is not in the set.
+     *         Checks membership of an elm in the multiset.
      *
-     * @param {any} elm - element to retrieve the multiplicity for.
+     * @param {any} elm - element to check the membership for.
      *
-     * @returns {int|undefined} the multiplicity of the element. undefined if not a member of the set.
+     * @returns {boolean} boolean indicating the membership of the element.
      */
-    get: function(elm) {
-    "@aliases: multiplicityOf";
+    has: function(elm) {
+    "@aliases: isMember";
     {
-        return this.elements.get(elm)
+        return !!this.elements.get(elm)
     }},
     /**
      * @method MultiSet#init
@@ -206,31 +261,94 @@ const properties = {
         return this
     },
     /**
-     * @method MultiSet#has
-     * @desc   **aliases:** isMember
+     * @method MultiSet#intersection
+     * @desc   **aliases:** and
      * #
-     *         Checks membership of an elm in the multiset.
+     *         Calculates the intersection between 2 multisets.
      *
-     * @param {any} elm - element to check the membership for.
+     * @param {MultiSet} multiset
      *
-     * @returns {boolean} boolean indicating the membership of the element.
+     * @returns {MultiSet} this
      */
-    has: function(elm) {
-    "@aliases: isMember";
+    intersection: function(multiset) {
+    "@aliases: and";
     {
-        return !!this.elements.get(elm)
+        let nmul;
+
+        this.elements.forEach((multiplicity, elm) => {
+            nmul = Math.min(multiplicity, multiset.multiplicity(elm));
+
+            if(!nmul) {this.elements.delete(elm)}
+            else      {this.elements.set(elm, nmul)}
+        });
+
+        return this
+    }},
+    /**
+     * @method MultiSet#Intersection
+     * @desc   **aliases:** And
+     * #
+     *         Calculates the intersection between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} new MultiSet containing the intersection.
+     */
+    Intersection: function(multiset) {
+    "@aliases: And";
+    {
+        let output = MultiSet.create();
+        let nmul;
+
+        this.elements.forEach((multiplicity, elm) => {
+            nmul = Math.min(multiplicity, multiset.multiplicity(elm));
+
+            if(nmul) {output.elements.set(elm, nmul)}
+        });
+
+        return output
+    }},
+    /**
+     * @method MultiSet#isSubsetOf
+     * @desc   **aliases:** isContainedIn
+     * #
+     *         Checks if a multiset is a subset of another
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {boolean} Boolean indicating if the current subset is contained in another.
+     */
+    isSubsetOf: function(multiset) {
+    "@aliases: isContainedIn";
+    {
+        return multiset.contains(this)
     }},
     /**
      * @method MultiSet#keys
-     * @desc
+     * @desc   **aliases:** underlyingElements
+     * #
      *         Returns a new Iterator object that contains the unique elements in the Set object in insertion order.
      *
      * @returns {Iterator.<any>}
      */
     keys: function() {
+    "@aliases: underlyingElements";
     {
         return this.elements.keys();
     }},
+    /**
+     * @method MultiSet#multiplicity
+     * @desc
+     *         Returns the multiplicity for a given element or 0 if it is not a member.
+     *
+     * @param {any} elm - The element to get the multiplicity for.
+     *
+     * @returns {int}
+     */
+    multiplicity: function(elm)
+    {
+        return this.elements.get(elm) || zero;
+    },
     /**
      * @method MultiSet#remove
      * @desc   **aliases:** delete
@@ -258,10 +376,64 @@ const properties = {
         return this
     }},
     /**
+     * @method MultiSet#symmetricDifference
+     * @desc   **aliases:** exclusion
+     * #
+     *         Calculates the symmetricDifference between 2 multisets.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} this
+     */
+    symmetricDifference: function(multiset) {
+    "@aliases: exclusion";
+    {
+        let diff;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            diff = this.multiplicity(elm) - multiplicity;
+
+            if(!diff) {this.elements.delete(elm)}
+            else      {this.elements.set(elm, Math.abs(diff))}
+        });
+
+        return this
+    }},
+    /**
+     * @method MultiSet#SymmetricDifference
+     * @desc   **aliases:** Exclusion
+     * #
+     *         Calculates the SymmetricDifference between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} new MultiSet containing the symmetric difference.
+     */
+    SymmetricDifference: function(multiset) {
+    "@aliases: Exclusion";
+    {
+        let output = this.clone();
+        let diff;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            diff = output.multiplicity(elm) - multiplicity;
+
+            if(!diff) {output.elements.delete(elm)}
+            else      {output.elements.set(elm, Math.abs(diff))}
+        });
+
+        return output
+    }},
+    /**
      * @method MultiSet#toString
      * @desc   **aliases:** stringify
      * #
      *         Stringifies the MultiSet in simple array style.
+     *
+     * @param {int} mode - the mode for stringification:
+     *                     default : {7 => 3, 67 => 1, 8 => 1}               (map style)
+     *                      1      : [7, 7, 7, 67, 8]                        (array style)
+     *                     -1      : ({7, 67, 8}, {(7, 3), (67, 1), (8, 1)}) (formal)
      *
      * @returns {string}
      */
@@ -272,7 +444,7 @@ const properties = {
 
         switch(mode)
         {
-            case -1 : out += `({${(this.alphabet()+'').replace(/,/g,`, `)}}, {`;
+            case -1 : out += `({${(Array.from(this.keys())+'').replace(/,/g,`, `)}}, {`;
                       this.each((elm, mul) => out += `${out[out.length-1] !== `{` ? `, ` : ``}(${elm}, ${mul})`);
                       out += `})`; break;
             case  1 : out += `[`; this.each$(elm =>       out += `${out !== `[` ? `, ` : ``}${elm}`);           out += `]`; break;
@@ -280,6 +452,42 @@ const properties = {
         }
 
         return out
+    }},
+    /**
+     * @method MultiSet#union
+     * @desc   **aliases:** or
+     * #
+     *         Calculates the union between 2 multisets.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} this
+     */
+    union: function(multiset) {
+    "@aliases: or";
+    {
+        multiset.elements.forEach((multiplicity, elm) => this.elements.set(elm, Math.max(multiplicity, this.multiplicity(elm))));
+
+        return this
+    }},
+    /**
+     * @method MultiSet#Union
+     * @desc   **aliases:** Or
+     * #
+     *         Calculates the Union between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} The union of the 2 multisets in a new MultiSet.
+     */
+    Union: function(multiset) {
+    "@aliases: Or";
+    {
+        let output = this.clone();
+
+        multiset.elements.forEach((multiplicity, elm) => output.elements.set(elm, Math.max(multiplicity, output.multiplicity(elm))));
+
+        return output
     }},
     /**
      * @method MultiSet#values

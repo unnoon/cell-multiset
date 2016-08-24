@@ -1,7 +1,5 @@
 'use strict';
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -83,35 +81,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             return this;
         },
         /**
-         * @method MultiSet#alphabet
-         * @desc   **aliases:** underlyingElements
-         * #
-         *         Returns the alphabet (underlying elements) of the multiset in array form.
-         *
-         * @returns {Array}
-         */
-        alphabet: function alphabet() {
-            "@aliases: underlyingElements";
-
-            var _this = this;
-
-            {
-                var _ret = function () {
-                    var underlyingElements = [];
-
-                    _this.forEach(function (letter) {
-                        return underlyingElements.push(letter);
-                    });
-
-                    return {
-                        v: underlyingElements
-                    };
-                }();
-
-                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-            }
-        },
-        /**
          * @name MultiSet#cardinality
          * @desc **aliases:** size
          * #
@@ -129,7 +98,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 this.elements.forEach(function (multiplicity) {
                     return len += multiplicity;
-                }); // TODO improve speed
+                });
 
                 return len;
             }
@@ -150,6 +119,105 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             return this;
         },
         /**
+         * @method MultiSet#clone
+         * @desc
+         *         Creates a clone of the multiset.
+         *
+         * @returns {MultiSet} clone
+         */
+        clone: function clone() {
+            return MultiSet.create(this.values());
+        },
+        /**
+         * @method MultiSet#contains
+         * @desc
+         *         Checks if a multiset contains another.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {boolean} Boolean indicating if the multiset is contained in the current one.
+         */
+        contains: function contains(multiset) {
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = multiset.elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var a = _step.value;
+                    if (a[1] /*multiplicity*/ > this.multiplicity(a[0] /*elm*/)) {
+                        return false;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return true;
+        },
+        /**
+         * @method MultiSet#difference
+         * @desc
+         *         Calculates the difference between 2 multisets.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} this
+         */
+        difference: function difference(multiset) {
+            var _this = this;
+
+            var nmul = void 0;
+
+            multiset.elements.forEach(function (multiplicity, elm) {
+                nmul = _this.multiplicity(elm) - multiplicity;
+
+                if (nmul <= 0) {
+                    _this.elements.delete(elm);
+                } else {
+                    _this.elements.set(elm, nmul);
+                }
+            });
+
+            return this;
+        },
+        /**
+         * @method MultiSet#Difference
+         * @desc
+         *         Calculates the difference between 2 multisets into a new MultiSet.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} new MultiSet containing the difference
+         */
+        Difference: function Difference(multiset) {
+            var _this2 = this;
+
+            var output = MultiSet.create();
+            var nmul = void 0;
+
+            multiset.elements.forEach(function (multiplicity, elm) {
+                nmul = _this2.multiplicity(elm) - multiplicity;
+
+                if (nmul > 0) {
+                    output.elements.set(elm, nmul);
+                }
+            });
+
+            return output;
+        },
+        /**
          * @method MultiSet#each
          * @desc   **aliases:** forEach
          * #
@@ -166,71 +234,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             var ctx = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
             {
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
-
-                try {
-                    for (var _iterator = this.elements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var _step$value = _slicedToArray(_step.value, 2);
-
-                        var elm = _step$value[0];
-                        var multiplicity = _step$value[1];
-
-                        if (cb.call(ctx, elm, multiplicity, this) === false) {
-                            return false;
-                        }
-                    }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-                    } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
-                        }
-                    }
-                }
-
-                return true;
-            }
-        },
-        /**
-         * @method MultiSet#each
-         * @desc   **aliases:** forEach$, eachAll, forEachAll
-         * #
-         *         Iterates over the all elements of the set. Repeating elements if the multiplicity is higher then 1.
-         *         Can be broken prematurely by returning false.
-         *
-         * @param {function(value, count, this)} cb   - callback function to be called on each element.
-         * @param {Object=}                      ctx - context for the callback function.
-         *
-         * @returns {boolean} boolean reflecting the result of the callback function
-         */
-        each$: function each$(cb) {
-            "@aliases: forEach$, eachAll, forEachAll";
-
-            var ctx = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-            {
-                var count = 0;
+                // for(let [elm, multiplicity] of this.elements) // destructuring is nice but slow...
                 var _iteratorNormalCompletion2 = true;
                 var _didIteratorError2 = false;
                 var _iteratorError2 = undefined;
 
                 try {
                     for (var _iterator2 = this.elements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var _step2$value = _slicedToArray(_step2.value, 2);
+                        var a = _step2.value;
 
-                        var elm = _step2$value[0];
-                        var multiplicity = _step2$value[1];
-                        for (var i = 0; i < multiplicity; i++, count++) {
-                            if (cb.call(ctx, elm, count, this) === false) {
-                                return false;
-                            }
+                        if (cb.call(ctx, a[0] /*elm*/, a[1] /*multiplicity*/, this) === false) {
+                            return false;
                         }
                     }
                 } catch (err) {
@@ -252,55 +266,36 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         },
         /**
-         * @method MultiSet#entries
-         * @desc
-         *         A new Iterator object that contains an array of [elm, multiplicity] for each element in the given Set, in insertion order.
-         *
-         * @returns {Iterator.<any>}
-         */
-        entries: function entries() {
-            return this.elements.entries();
-        },
-        /**
-         * @method MultiSet#get
-         * @desc   **aliases:** multiplicityOf
+         * @method MultiSet#each$
+         * @desc   **aliases:** forEach$, eachAll, forEachAll
          * #
-         *         Map style getter to return the multiplicity of an element. undefined if the element is not in the set.
+         *         Iterates over the all elements of the set. Repeating elements if the multiplicity is higher then 1.
+         *         Can be broken prematurely by returning false.
          *
-         * @param {any} elm - element to retrieve the multiplicity for.
+         * @param {function(value, count, this)} cb   - callback function to be called on each element.
+         * @param {Object=}                      ctx - context for the callback function.
          *
-         * @returns {int|undefined} the multiplicity of the element. undefined if not a member of the set.
+         * @returns {boolean} boolean reflecting the result of the callback function
          */
-        get: function get(elm) {
-            "@aliases: multiplicityOf";
+        each$: function each$(cb) {
+            "@aliases: forEach$, eachAll, forEachAll";
 
+            var ctx = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
             {
-                return this.elements.get(elm);
-            }
-        },
-        /**
-         * @method MultiSet#init
-         * @desc
-         *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
-         *
-         * @param {Iterable.<any>=} elms - iterable object to initialize the set.
-         *
-         * @returns {MultiSet} this
-         */
-        init: function init() {
-            var elms = arguments.length <= 0 || arguments[0] === undefined ? void 0 : arguments[0];
-
-            this.elements = new Map();
-
-            if (elms) {
+                var count = 0;
+                // for(let [elm, multiplicity] of this.elements) // destructuring is nice but slow...
                 var _iteratorNormalCompletion3 = true;
                 var _didIteratorError3 = false;
                 var _iteratorError3 = undefined;
 
                 try {
-                    for (var _iterator3 = elms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var elm = _step3.value;
-                        this.add(elm);
+                    for (var _iterator3 = this.elements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var a = _step3.value;
+                        for (var i = 0, mul = a[1] /*multiplicity*/; i < mul; i++, count++) {
+                            if (cb.call(ctx, a[0] /*elm*/, count, this) === false) {
+                                return false;
+                            }
+                        }
                     }
                 } catch (err) {
                     _didIteratorError3 = true;
@@ -316,9 +311,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                         }
                     }
                 }
-            }
 
-            return this;
+                return true;
+            }
+        },
+        /**
+         * @method MultiSet#entries
+         * @desc
+         *         A new Iterator object that contains an array of [elm, multiplicity] for each element in the given Set, in insertion order.
+         *
+         * @returns {Iterator.<any>}
+         */
+        entries: function entries() {
+            return this.elements.entries();
         },
         /**
          * @method MultiSet#has
@@ -338,16 +343,163 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         },
         /**
-         * @method MultiSet#keys
+         * @method MultiSet#init
          * @desc
+         *         Initializes the MultiSet. Useful in case one wants to use 'Object.create' instead of 'new'.
+         *
+         * @param {Iterable.<any>=} elms - iterable object to initialize the set.
+         *
+         * @returns {MultiSet} this
+         */
+        init: function init() {
+            var elms = arguments.length <= 0 || arguments[0] === undefined ? void 0 : arguments[0];
+
+            this.elements = new Map();
+
+            if (elms) {
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
+
+                try {
+                    for (var _iterator4 = elms[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        var elm = _step4.value;
+                        this.add(elm);
+                    }
+                } catch (err) {
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                            _iterator4.return();
+                        }
+                    } finally {
+                        if (_didIteratorError4) {
+                            throw _iteratorError4;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        },
+        /**
+         * @method MultiSet#intersection
+         * @desc   **aliases:** and
+         * #
+         *         Calculates the intersection between 2 multisets.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} this
+         */
+        intersection: function intersection(multiset) {
+            "@aliases: and";
+
+            var _this3 = this;
+
+            {
+                var _ret = function () {
+                    var nmul = void 0;
+
+                    _this3.elements.forEach(function (multiplicity, elm) {
+                        nmul = Math.min(multiplicity, multiset.multiplicity(elm));
+
+                        if (!nmul) {
+                            _this3.elements.delete(elm);
+                        } else {
+                            _this3.elements.set(elm, nmul);
+                        }
+                    });
+
+                    return {
+                        v: _this3
+                    };
+                }();
+
+                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            }
+        },
+        /**
+         * @method MultiSet#Intersection
+         * @desc   **aliases:** And
+         * #
+         *         Calculates the intersection between 2 multisets into a new MultiSet.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} new MultiSet containing the intersection.
+         */
+        Intersection: function Intersection(multiset) {
+            "@aliases: And";
+
+            var _this4 = this;
+
+            {
+                var _ret2 = function () {
+                    var output = MultiSet.create();
+                    var nmul = void 0;
+
+                    _this4.elements.forEach(function (multiplicity, elm) {
+                        nmul = Math.min(multiplicity, multiset.multiplicity(elm));
+
+                        if (nmul) {
+                            output.elements.set(elm, nmul);
+                        }
+                    });
+
+                    return {
+                        v: output
+                    };
+                }();
+
+                if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+            }
+        },
+        /**
+         * @method MultiSet#isSubsetOf
+         * @desc   **aliases:** isContainedIn
+         * #
+         *         Checks if a multiset is a subset of another
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {boolean} Boolean indicating if the current subset is contained in another.
+         */
+        isSubsetOf: function isSubsetOf(multiset) {
+            "@aliases: isContainedIn";
+
+            {
+                return multiset.contains(this);
+            }
+        },
+        /**
+         * @method MultiSet#keys
+         * @desc   **aliases:** underlyingElements
+         * #
          *         Returns a new Iterator object that contains the unique elements in the Set object in insertion order.
          *
          * @returns {Iterator.<any>}
          */
         keys: function keys() {
+            "@aliases: underlyingElements";
+
             {
                 return this.elements.keys();
             }
+        },
+        /**
+         * @method MultiSet#multiplicity
+         * @desc
+         *         Returns the multiplicity for a given element or 0 if it is not a member.
+         *
+         * @param {any} elm - The element to get the multiplicity for.
+         *
+         * @returns {int}
+         */
+        multiplicity: function multiplicity(elm) {
+            return this.elements.get(elm) || zero;
         },
         /**
          * @method MultiSet#remove
@@ -380,10 +532,90 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         },
         /**
+         * @method MultiSet#symmetricDifference
+         * @desc   **aliases:** exclusion
+         * #
+         *         Calculates the symmetricDifference between 2 multisets.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} this
+         */
+        symmetricDifference: function symmetricDifference(multiset) {
+            "@aliases: exclusion";
+
+            var _this5 = this;
+
+            {
+                var _ret3 = function () {
+                    var diff = void 0;
+
+                    multiset.elements.forEach(function (multiplicity, elm) {
+                        diff = _this5.multiplicity(elm) - multiplicity;
+
+                        if (!diff) {
+                            _this5.elements.delete(elm);
+                        } else {
+                            _this5.elements.set(elm, Math.abs(diff));
+                        }
+                    });
+
+                    return {
+                        v: _this5
+                    };
+                }();
+
+                if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+            }
+        },
+        /**
+         * @method MultiSet#SymmetricDifference
+         * @desc   **aliases:** Exclusion
+         * #
+         *         Calculates the SymmetricDifference between 2 multisets into a new MultiSet.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} new MultiSet containing the symmetric difference.
+         */
+        SymmetricDifference: function SymmetricDifference(multiset) {
+            "@aliases: Exclusion";
+
+            var _this6 = this;
+
+            {
+                var _ret4 = function () {
+                    var output = _this6.clone();
+                    var diff = void 0;
+
+                    multiset.elements.forEach(function (multiplicity, elm) {
+                        diff = output.multiplicity(elm) - multiplicity;
+
+                        if (!diff) {
+                            output.elements.delete(elm);
+                        } else {
+                            output.elements.set(elm, Math.abs(diff));
+                        }
+                    });
+
+                    return {
+                        v: output
+                    };
+                }();
+
+                if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+            }
+        },
+        /**
          * @method MultiSet#toString
          * @desc   **aliases:** stringify
          * #
          *         Stringifies the MultiSet in simple array style.
+         *
+         * @param {int} mode - the mode for stringification:
+         *                     default : {7 => 3, 67 => 1, 8 => 1}               (map style)
+         *                      1      : [7, 7, 7, 67, 8]                        (array style)
+         *                     -1      : ({7, 67, 8}, {(7, 3), (67, 1), (8, 1)}) (formal)
          *
          * @returns {string}
          */
@@ -395,7 +627,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 switch (mode) {
                     case -1:
-                        out += '({' + (this.alphabet() + '').replace(/,/g, ', ') + '}, {';
+                        out += '({' + (Array.from(this.keys()) + '').replace(/,/g, ', ') + '}, {';
                         this.each(function (elm, mul) {
                             return out += (out[out.length - 1] !== '{' ? ', ' : '') + '(' + elm + ', ' + mul + ')';
                         });
@@ -411,6 +643,60 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 return out;
+            }
+        },
+        /**
+         * @method MultiSet#union
+         * @desc   **aliases:** or
+         * #
+         *         Calculates the union between 2 multisets.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} this
+         */
+        union: function union(multiset) {
+            "@aliases: or";
+
+            var _this7 = this;
+
+            {
+                multiset.elements.forEach(function (multiplicity, elm) {
+                    return _this7.elements.set(elm, Math.max(multiplicity, _this7.multiplicity(elm)));
+                });
+
+                return this;
+            }
+        },
+        /**
+         * @method MultiSet#Union
+         * @desc   **aliases:** Or
+         * #
+         *         Calculates the Union between 2 multisets into a new MultiSet.
+         *
+         * @param {MultiSet} multiset
+         *
+         * @returns {MultiSet} The union of the 2 multisets in a new MultiSet.
+         */
+        Union: function Union(multiset) {
+            "@aliases: Or";
+
+            var _this8 = this;
+
+            {
+                var _ret5 = function () {
+                    var output = _this8.clone();
+
+                    multiset.elements.forEach(function (multiplicity, elm) {
+                        return output.elements.set(elm, Math.max(multiplicity, output.multiplicity(elm)));
+                    });
+
+                    return {
+                        v: output
+                    };
+                }();
+
+                if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
             }
         },
         /**
@@ -502,9 +788,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         };
 
         for (var prop in properties) {
-            var _ret2 = _loop(prop);
+            var _ret6 = _loop(prop);
 
-            if (_ret2 === 'continue') continue;
+            if (_ret6 === 'continue') continue;
         }
 
         return obj;
