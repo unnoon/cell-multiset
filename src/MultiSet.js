@@ -448,7 +448,7 @@ const properties = {
 
         switch(mode)
         {
-            case -1 : out += `({${(Array.from(this.keys())+'').replace(/,/g,`, `)}}, {`;
+            case -1 : out += `({${`${Array.from(this.keys())}`.replace(/,/g,`, `)}}, {`;
                       this.each((elm, mul) => out += `${out[out.length-1] !== `{` ? `, ` : ``}(${elm}, ${mul})`);
                       out += `})`; break;
             case  1 : out += `[`; this.each$(elm =>       out += `${out !== `[` ? `, ` : ``}${elm}`);           out += `]`; break;
@@ -568,8 +568,8 @@ function extend(obj, properties)
     {   if(!properties.hasOwnProperty(prop)) {continue}
 
         let dsc      = Object.getOwnPropertyDescriptor(properties, prop);
-        let attrs    = prop.match(/[\w\$\@]+/g); prop = attrs[attrs.length-1]; attrs.pop();
-        let aliases  = (dsc.value || dsc.get || dsc.set).toString().match(/@aliases:(.*?);/);
+        let attrs    = prop.match(/[\w\$\@]+/g); prop = attrs.pop();
+        let aliases  = `${dsc.value || dsc.get || dsc.set}`.match(/@aliases:(.*?);/);
         let names    = aliases? aliases[1].match(/[\w\$]+/g) : []; names.unshift(prop);
         let symbol   = prop.match(/@@(.+)/); symbol = symbol ? symbol[1] : '';
         let addProp  = function(obj, name) {if(symbol) {obj[Symbol[symbol]] = dsc.value} else {Reflect.defineProperty(obj, name, dsc)}};
