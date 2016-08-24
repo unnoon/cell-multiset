@@ -25,7 +25,7 @@ const properties = {
     "static info": {
         "name"       : "cell-multiset",
         "description": "Fast JS MultiSet implementation.",
-        "version"    : "0.0.0",
+        "version"    : "0.0.1",
         "url"        : "https://github.com/unnoon/cell-multiset"
     },
     /**
