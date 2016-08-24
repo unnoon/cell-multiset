@@ -103,6 +103,17 @@ const properties = {
         return this
     },
     /**
+     * @method MultiSet#clone
+     * @desc
+     *         Creates a clone of the multiset.
+     *
+     * @returns {MultiSet} clone
+     */
+    clone: function()
+    {
+        return MultiSet.create(this.values());
+    },
+    /**
      * @method MultiSet#contains
      * @desc
      *         Checks if a multiset contains another.
@@ -138,6 +149,28 @@ const properties = {
         });
 
         return this
+    },
+    /**
+     * @method MultiSet#Difference
+     * @desc
+     *         Calculates the difference between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} new MultiSet containing the difference
+     */
+    Difference: function(multiset)
+    {
+        var output = MultiSet.create();
+        let nmul;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            nmul = this.multiplicity(elm) - multiplicity;
+
+            if(nmul > 0) {output.elements.set(elm, nmul)}
+        });
+
+        return output
     },
     /**
      * @method MultiSet#each
@@ -256,6 +289,30 @@ const properties = {
         return this
     }},
     /**
+     * @method MultiSet#Intersection
+     * @desc   **aliases:** And
+     * #
+     *         Calculates the intersection between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} new MultiSet containing the intersection.
+     */
+    Intersection: function(multiset) {
+    "@aliases: And";
+    {
+        let output = MultiSet.create();
+        let nmul;
+
+        this.elements.forEach((multiplicity, elm) => {
+            nmul = Math.min(multiplicity, multiset.multiplicity(elm));
+
+            if(nmul) {output.elements.set(elm, nmul)}
+        });
+
+        return output
+    }},
+    /**
      * @method MultiSet#isSubsetOf
      * @desc   **aliases:** isContainedIn
      * #
@@ -323,6 +380,55 @@ const properties = {
         return this
     }},
     /**
+     * @method MultiSet#symmetricDifference
+     * @desc   **aliases:** exclusion
+     * #
+     *         Calculates the symmetricDifference between 2 multisets.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} this
+     */
+    symmetricDifference: function(multiset) {
+    "@aliases: exclusion";
+    {
+        let diff;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            diff = this.multiplicity(elm) - multiplicity;
+
+            if(!diff) {this.elements.delete(elm)}
+            else      {this.elements.set(elm, Math.abs(diff))}
+        });
+
+        return this
+    }},
+    /**
+     * @method MultiSet#SymmetricDifference
+     * @desc   **aliases:** Exclusion
+     * #
+     *         Calculates the SymmetricDifference between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} new MultiSet containing the symmetric difference.
+     */
+    SymmetricDifference: function(multiset) {
+    "@aliases: Exclusion";
+    {
+        let output = this.clone();
+        let diff;
+
+        multiset.elements.forEach((multiplicity, elm) => {
+            diff = output.multiplicity(elm) - multiplicity;
+
+            if(!diff) {output.elements.delete(elm)}
+            else      {output.elements.set(elm, Math.abs(diff))}
+        });
+
+        return output
+    }},    
+    /**
      * @method MultiSet#toString
      * @desc   **aliases:** stringify
      * #
@@ -368,6 +474,25 @@ const properties = {
 
         return this
     }},
+    /**
+     * @method MultiSet#Union
+     * @desc   **aliases:** Or
+     * #
+     *         Calculates the Union between 2 multisets into a new MultiSet.
+     *
+     * @param {MultiSet} multiset
+     *
+     * @returns {MultiSet} The union of the 2 multisets in a new MultiSet.
+     */
+    Union: function(multiset) {
+    "@aliases: Or";
+    {
+        let output = this.clone();
+
+        multiset.elements.forEach((multiplicity, elm) => output.elements.set(elm, Math.max(multiplicity, output.multiplicity(elm))));
+
+        return output
+    }},    
     /**
      * @method MultiSet#values
      * @desc

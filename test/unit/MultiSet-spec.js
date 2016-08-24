@@ -114,6 +114,17 @@ define([
             });
         });
 
+        describe("clone", function() {
+
+            it("should create a clone of a multiset", function() {
+
+                var ms    = MultiSet.create().add(7, 67, 23);
+                var clone = ms.clone();
+
+                expect(ms.toString()).to.eql(clone.toString());
+            });
+        });
+
         describe("contains", function() {
 
             it("should check containment", function() {
@@ -139,6 +150,20 @@ define([
             });
         });
 
+        describe("Difference", function() {
+
+            it("should calculate the Difference between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                var diff = ms1.Difference(ms2);
+
+                expect(diff.toString(1)).to.eql('[1]');
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+        });        
+        
         describe("each/forEach", function() {
 
             it("should iterate over the alphabet of the set", function() {
@@ -271,6 +296,31 @@ define([
             });
         });
 
+        describe("Intersection/And", function() {
+
+            it("should calculate the Intersection between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1, 1, 3]);
+                var ms2 = MultiSet.create([1, 1]);
+
+                var intersection = ms1.Intersection(ms2);
+
+                expect(intersection.toString(1)).to.eql('[1, 1]');
+                expect(ms1.toString(1)).to.eql('[1, 1, 1, 3]');
+            });
+
+            it("should be able to use the alias And", function() {
+
+                var ms1 = MultiSet.create([1, 1, 1, 3]);
+                var ms2 = MultiSet.create([1, 1]);
+
+                var intersection = ms1.And(ms2);
+
+                expect(intersection.toString(1)).to.eql('[1, 1]');
+                expect(ms1.toString(1)).to.eql('[1, 1, 1, 3]');
+            });
+        });        
+
         describe("isSubsetOf/isContainedIn", function() {
 
             it("should check if it is a subset of another", function() {
@@ -334,6 +384,54 @@ define([
             });
         });
 
+        describe("symmetricDifference/exclusion", function() {
+
+            it("should calculate the symmetricDifference between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                ms1.symmetricDifference(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1, 2]');
+            });
+
+            it("should be able to use the alias exclusion", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                ms1.exclusion(ms2);
+
+                expect(ms1.toString(1)).to.eql('[1, 2]');
+            });
+        });
+
+        describe("SymmetricDifference/Exclusion", function() {
+
+            it("should calculate the SymmetricDifference between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                var sd = ms1.SymmetricDifference(ms2);
+
+                expect(sd.toString(1)).to.eql('[1, 2]');
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+
+            it("should be possible to use the alias Exclusion", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                var sd = ms1.Exclusion(ms2);
+
+                expect(sd.toString(1)).to.eql('[1, 2]');
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+        });
+
         describe("toString/stringify", function() {
 
             it("should, by default, output all elements in {value => multiplicity, ...} pairs (like a map).", function() {
@@ -379,7 +477,33 @@ define([
 
                 expect(ms1.toString(1)).to.eql('[1, 1, 2]');
             });
-        });        
+        });
+
+
+        describe("Union/Or", function() {
+
+            it("should calculate the Union between 2 multisets", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                var union = ms1.Union(ms2);
+
+                expect(union.toString(1)).to.eql('[1, 1, 2]');
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+
+            it("should be able to use the alias Or", function() {
+
+                var ms1 = MultiSet.create([1, 1]);
+                var ms2 = MultiSet.create([1, 2]);
+
+                var union = ms1.Or(ms2);
+
+                expect(union.toString(1)).to.eql('[1, 1, 2]');
+                expect(ms1.toString(1)).to.eql('[1, 1]');
+            });
+        });
         
         describe("values", function() {
 
