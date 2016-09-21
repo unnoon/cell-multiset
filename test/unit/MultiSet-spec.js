@@ -1,6 +1,7 @@
 define([
     'MultiSet'
 ], function(MultiSet) {
+    const CMultiSet = MultiSet.constructor;
 
     describe("MultiSet", function() {
 
@@ -11,8 +12,7 @@ define([
 
                 var ms1 = MultiSet.create([7, 67, 7, 7, 'text', obj, 'text', obj]); // use an iterable for initialization.
                 var ms2 = Object.create(MultiSet).init([7, 67, 7, 'text', obj, 'text2', obj, 99]);
-                var ms3 = new MultiSet.constructor([7, 67, 7, 7, 'text', obj, 'text', obj]); // or use the constructor function. Preferably you would like to use the CMultiSet export for this.
-
+                var ms3 = new CMultiSet([7, 67, 7, 7, 'text', obj, 'text', obj]); // Use the CMultiSet export for classical inheritance.
                 expect(ms1.size).to.eql(8); // cardinality (@alias) of the multiset.
                 expect(ms1.toString()).to.eql('{7 => 3, 67 => 1, text => 2, [object Object] => 2}');
                 expect(ms1.has(7)).to.be.true;
@@ -581,15 +581,18 @@ define([
             });
         });
 
-        // disabled because this does not work in firefox yet
-        xdescribe("[@@toStringTag]", function() {
+        if(window.chrome)
+        {
+            // disabled because this does not work in firefox yet
+            describe("[@@toStringTag]", function() {
 
-            it("should return the custom type [object MultiSet] in case typeof is used", function() {
+                it("should return the custom type [object MultiSet] in case Object.prototype.toString.call(ms) is used", function() {
 
-                var ms = MultiSet.create([7, 7, 67, 23]);
+                    var ms = MultiSet.create([7, 7, 67, 23]);
 
-                expect(Object.prototype.toString.call(ms)).to.eql('[object MultiSet]');
+                    expect(Object.prototype.toString.call(ms)).to.eql('[object MultiSet]');
+                });
             });
-        });
+        }
     });
 });
