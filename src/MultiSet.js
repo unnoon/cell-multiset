@@ -558,7 +558,6 @@ const properties = {
  * @constructor MultiSet
  * @desc
  *        Fast JS MultiSet implementation.
- *        'class' stuff...
  *
  * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
  *
