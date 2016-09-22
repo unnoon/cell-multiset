@@ -2,6 +2,8 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /*!
@@ -17,17 +19,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         /*node*/case (typeof module === 'undefined' ? 'undefined' : _typeof(module)) === 'object' && root === module.exports:
             module.exports = multiset();break;
         /*global*/case !root.MultiSet:
-            Object.defineProperty(root, 'MultiSet', { value: multiset(), enumerable: !0 });break;default:
+            Reflect.defineProperty(root, 'MultiSet', { value: multiset(), enumerable: !0 });break;default:
             console.error("'MultiSet' is already defined on root object");}
 }(undefined, function multiset() {
     "use strict";
     /*es6*/ /*<3*/
     // int32 consts
 
-    var _properties;
+    var _info, _Symbol$species, _properties;
 
-    var zero = 0 | 0;
-    var one = 1 | 0;
+    var ZERO = 0 | 0;
+    var ONE = 1 | 0;
+
+    var $attrs = Symbol.for('cell-type.attrs');
 
     var properties = (_properties = {
         /**
@@ -36,12 +40,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @desc
          *       Info object to hold general module information.
          */
-        "static info": {
+        info: (_info = {}, _defineProperty(_info, $attrs, 'static !configurable !writable'), _defineProperty(_info, 'value', {
             "name": "cell-multiset",
             "description": "Fast JS MultiSet implementation.",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "url": "https://github.com/unnoon/cell-multiset"
-        },
+        }), _info),
         /**
          * @method MultiSet.create
          * @desc   **aliases:** spawn
@@ -52,14 +56,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          *
          * @return {MultiSet} new MultiSet
          */
-        "static create": function staticCreate() {
-            "@aliases: spawn";
+        create: function create() {
+            "<$attrs static alias=spawn>";
 
             var iterable = arguments.length <= 0 || arguments[0] === undefined ? void 0 : arguments[0];
             {
                 return Object.create(MultiSet.prototype).init(iterable);
             }
         },
+
         /**
          * @method MultiSet#add
          * @desc
@@ -72,14 +77,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         add: function add() {
             var max = arguments.length;
 
-            for (var i = zero, elm; i < max; i++) {
+            for (var i = ZERO, elm; i < max; i++) {
                 elm = arguments.length <= i + 0 ? undefined : arguments[i + 0];
 
-                this.elements.set(elm, (this.elements.get(elm) || zero) + one);
+                this.elements.set(elm, (this.elements.get(elm) || ZERO) + ONE);
             }
 
             return this;
         },
+
         /**
          * @name MultiSet#cardinality
          * @desc **aliases:** size
@@ -91,10 +97,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @type number
          */
         get cardinality() {
-            "@aliases: size";
+            "<$attrs alias=size>";
 
             {
-                var len = zero;
+                var len = ZERO;
 
                 this.elements.forEach(function (multiplicity) {
                     return len += multiplicity;
@@ -118,6 +124,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             return this;
         },
+
         /**
          * @method MultiSet#clone
          * @desc
@@ -128,6 +135,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         clone: function clone() {
             return MultiSet.create(this.values());
         },
+
         /**
          * @method MultiSet#contains
          * @desc
@@ -166,6 +174,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             return true;
         },
+
         /**
          * @method MultiSet#difference
          * @desc
@@ -192,6 +201,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             return this;
         },
+
         /**
          * @method MultiSet#Difference
          * @desc
@@ -217,6 +227,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             return output;
         },
+
         /**
          * @method MultiSet#each
          * @desc   **aliases:** forEach
@@ -230,7 +241,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {boolean} boolean reflecting the result of the callback function
          */
         each: function each(cb) {
-            "@aliases: forEach";
+            "<$attrs alias=forEach>";
 
             var ctx = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
             {
@@ -265,6 +276,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 return true;
             }
         },
+
         /**
          * @method MultiSet#each$
          * @desc   **aliases:** forEach$, eachAll, forEachAll
@@ -278,7 +290,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {boolean} boolean reflecting the result of the callback function
          */
         each$: function each$(cb) {
-            "@aliases: forEach$, eachAll, forEachAll";
+            "<$attrs alias=forEach$|eachAll|forEachAll>";
 
             var ctx = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
             {
@@ -319,6 +331,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 return true;
             }
         },
+
         /**
          * @method MultiSet#entries
          * @desc
@@ -329,6 +342,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         entries: function entries() {
             return this.elements.entries();
         },
+
         /**
          * @method MultiSet#equals
          * @desc
@@ -349,6 +363,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 return mul !== _this3.multiplicity(elm);
             });
         },
+
         /**
          * @method MultiSet#has
          * @desc   **aliases:** isMember
@@ -360,12 +375,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {boolean} boolean indicating the membership of the element.
          */
         has: function has(elm) {
-            "@aliases: isMember";
+            "<$attrs alias=isMember>";
 
             {
                 return !!this.elements.get(elm);
             }
         },
+
         /**
          * @method MultiSet#init
          * @desc
@@ -408,6 +424,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             return this;
         },
+
         /**
          * @method MultiSet#intersection
          * @desc   **aliases:** and
@@ -419,7 +436,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} this
          */
         intersection: function intersection(multiset) {
-            "@aliases: and";
+            "<$attrs alias=and>";
 
             var _this4 = this;
 
@@ -445,6 +462,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
             }
         },
+
         /**
          * @method MultiSet#Intersection
          * @desc   **aliases:** And
@@ -456,7 +474,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} new MultiSet containing the intersection.
          */
         Intersection: function Intersection(multiset) {
-            "@aliases: And";
+            "<$attrs alias=And>";
 
             var _this5 = this;
 
@@ -481,6 +499,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
             }
         },
+
         /**
          * @method MultiSet#isSubsetOf
          * @desc   **aliases:** isContainedIn
@@ -492,12 +511,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {boolean} Boolean indicating if the current subset is contained in another.
          */
         isSubsetOf: function isSubsetOf(multiset) {
-            "@aliases: isContainedIn";
+            "<$attrs alias=isContainedIn>";
 
             {
                 return multiset.contains(this);
             }
         },
+
         /**
          * @method MultiSet#keys
          * @desc   **aliases:** underlyingElements
@@ -507,12 +527,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {Iterator.<any>}
          */
         keys: function keys() {
-            "@aliases: underlyingElements";
+            "<$attrs alias=underlyingElements>";
 
             {
                 return this.elements.keys();
             }
         },
+
         /**
          * @method MultiSet#multiplicity
          * @desc
@@ -523,8 +544,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {int}
          */
         multiplicity: function multiplicity(elm) {
-            return this.elements.get(elm) || zero;
+            return this.elements.get(elm) || ZERO;
         },
+
         /**
          * @method MultiSet#remove
          * @desc   **aliases:** delete
@@ -536,25 +558,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} this
          */
         remove: function remove() {
-            "@aliases: delete";
+            "<$attrs alias=delete>";
 
             {
                 var max = arguments.length;
 
-                for (var i = zero, elm, multiplicity; i < max; i++) {
+                for (var i = ZERO, elm, multiplicity; i < max; i++) {
                     elm = arguments.length <= i + 0 ? undefined : arguments[i + 0];
                     multiplicity = this.elements.get(elm);
 
                     if (multiplicity === 1) {
                         this.elements.delete(elm);
                     } else {
-                        this.elements.set(elm, Math.max(zero, --multiplicity));
+                        this.elements.set(elm, Math.max(ZERO, --multiplicity));
                     }
                 }
 
                 return this;
             }
         },
+
         /**
          * @method MultiSet#symmetricDifference
          * @desc   **aliases:** exclusion
@@ -566,7 +589,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} this
          */
         symmetricDifference: function symmetricDifference(multiset) {
-            "@aliases: exclusion";
+            "<$attrs alias=exclusion>";
 
             var _this6 = this;
 
@@ -592,6 +615,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
             }
         },
+
         /**
          * @method MultiSet#SymmetricDifference
          * @desc   **aliases:** Exclusion
@@ -603,7 +627,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} new MultiSet containing the symmetric difference.
          */
         SymmetricDifference: function SymmetricDifference(multiset) {
-            "@aliases: Exclusion";
+            "<$attrs alias=Exclusion>";
 
             var _this7 = this;
 
@@ -630,6 +654,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
             }
         },
+
         /**
          * @method MultiSet#toString
          * @desc   **aliases:** stringify
@@ -644,7 +669,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {string}
          */
         toString: function toString(mode) {
-            "@aliases: stringify";
+            "<$attrs alias=stringify>";
 
             var _this8 = this;
 
@@ -677,6 +702,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
             }
         },
+
         /**
          * @method MultiSet#union
          * @desc   **aliases:** or
@@ -688,7 +714,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} this
          */
         union: function union(multiset) {
-            "@aliases: or";
+            "<$attrs alias=or>";
 
             var _this9 = this;
 
@@ -700,6 +726,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 return this;
             }
         },
+
         /**
          * @method MultiSet#Union
          * @desc   **aliases:** Or
@@ -711,7 +738,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
          * @returns {MultiSet} The union of the 2 multisets in a new MultiSet.
          */
         Union: function Union(multiset) {
-            "@aliases: Or";
+            "<$attrs alias=Or>";
 
             var _this10 = this;
 
@@ -731,6 +758,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
             }
         },
+
         /**
          * @method MultiSet#values
          * @desc
@@ -760,14 +788,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }, _callee, this);
             })(data);
         }
-    }, _defineProperty(_properties, "@@iterator", function iterator() {
+    }, _defineProperty(_properties, Symbol.iterator, function () {
         return this.elements.entries();
-    }), _defineProperty(_properties, "static @@species", MultiSet), _defineProperty(_properties, "@@toStringTag", 'MultiSet'), _properties);
+    }), _defineProperty(_properties, Symbol.species, (_Symbol$species = {}, _defineProperty(_Symbol$species, $attrs, 'static'), _defineProperty(_Symbol$species, 'value', MultiSet), _Symbol$species)), _defineProperty(_properties, Symbol.toStringTag, 'MultiSet'), _properties);
     /**
      * @constructor MultiSet
      * @desc
      *        Fast JS MultiSet implementation.
-     *        'class' stuff...
      *
      * @param {Iterable.<any>=} iterable - iterable object to initialize the set.
      *
@@ -779,12 +806,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.init(iterable);
     }
 
-    extend(MultiSet, properties);
+    extend(MultiSet.prototype, properties);
 
     /**
      * @func extend
      * @desc
-     *       Very simple extend function including alias, static support.
+     *       Very simple extend function including alias, static and basic attribute support.
      *
      * @param {Object} obj        - object to extend.
      * @param {Object} properties - object with the extend properties.
@@ -792,29 +819,85 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
      * @returns {Object} the object after extension.
      */
     function extend(obj, properties) {
-        Object.keys(properties).forEach(function (prop) {
-            var dsc = Object.getOwnPropertyDescriptor(properties, prop);
-            var attrs = prop.match(/[\w\$\@]+/g);prop = attrs.pop();
-            var aliases = ('' + (dsc.value || dsc.get || dsc.set)).match(/@aliases:(.*?);/);
-            var names = aliases ? aliases[1].match(/[\w\$]+/g) : [];names.unshift(prop);
-            var symbol = prop.match(/@@(.+)/);symbol = symbol ? symbol[1] : '';
-            var addProp = function addProp(obj, name) {
-                if (symbol) {
-                    obj[Symbol[symbol]] = dsc.value;
-                } else {
-                    Reflect.defineProperty(obj, name, dsc);
-                }
-            };
+        [].concat(_toConsumableArray(Object.getOwnPropertySymbols(properties)), _toConsumableArray(Object.keys(properties))).forEach(function (prop) {
+            var dsc = processDescAttrs(Object.getOwnPropertyDescriptor(properties, prop));
+            var names = dsc.alias || [];names.unshift(prop);
 
             names.forEach(function (name) {
-                if (~attrs.indexOf('static')) {
-                    addProp(obj, name);
+                Object.defineProperty(obj, name, dsc);
+                if (dsc.static && obj.hasOwnProperty('constructor')) {
+                    Object.defineProperty(obj.constructor, name, dsc);
                 }
-                addProp(obj.prototype, name);
             });
         });
 
         return obj;
+    }
+    /**
+     * @func processDescAttrs
+     * @desc
+     *       processes any attributes passed to a function or on the $attrs symbol, in case of a property, and adds these to the descriptor.
+    
+     * @param {Object} dsc - Property descriptor to be processed.
+     *
+     * @returns {Object} The processed descriptor.
+     */
+    function processDescAttrs(dsc) {
+        var tmp = ('' + (dsc.value || dsc.get || dsc.set)).match(/<\$attrs(.*?)>/);
+        var tmp2 = ('' + (tmp ? tmp[1] : dsc.value && dsc.value[$attrs] || '')).replace(/[\s]*([=\|\s])[\s]*/g, '$1'); // prettify: remove redundant white spaces
+        var attributes = tmp2.match(/[!\$\w]+(=[\$\w]+(\|[\$\w]+)*)?/g) || []; // filter attributes including values
+
+        assignAttrsToDsc(attributes, dsc);
+
+        // if value is a descriptor set the value to the descriptor value
+        if (dsc.value && dsc.value[$attrs] !== undefined) {
+            dsc.value = dsc.value.value;
+        }
+
+        return dsc;
+    }
+    /**
+     * @func assignAttrsToDsc
+     *
+     * @param {Array<string>} attributes - Array containing the attributes.
+     * @param {Object}        dsc        - The descriptor to be extended with the attributes.
+     */
+    function assignAttrsToDsc(attributes, dsc) {
+        dsc.enumerable = false; // default set enumerable to false
+
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+            for (var _iterator5 = attributes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                var attr = _step5.value;
+                var value = void 0;
+                switch (true) {
+                    case !attr.indexOf('!'):
+                        value = false;attr = attr.slice(1);break;
+                    case !!~attr.indexOf('='):
+                        value = attr.match(/[\$\w]+/g);attr = value.shift();break;
+                    default:
+                        value = true;
+                }
+
+                dsc[attr] = value;
+            }
+        } catch (err) {
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                    _iterator5.return();
+                }
+            } finally {
+                if (_didIteratorError5) {
+                    throw _iteratorError5;
+                }
+            }
+        }
     }
     return MultiSet.prototype; // prefer prototypal inheritance
 });
